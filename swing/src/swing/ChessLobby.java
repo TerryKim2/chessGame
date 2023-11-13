@@ -21,7 +21,7 @@ public class ChessLobby extends JFrame {
         setTitle("Chess Lobby");
         setSize(1920, 1080);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ImageIcon img = new ImageIcon("C:\\Users\\cubby\\eclipse-workspace\\swing\\resources\\button_image.png");
+        ImageIcon img = new ImageIcon("swing/resources/button_image.png");
         
         JLabel textLabel1 = new JLabel("PLAY");
         textLabel1.setFont(new Font("times", Font.BOLD, 50));
@@ -49,7 +49,7 @@ public class ChessLobby extends JFrame {
         textLabel5.setForeground(Color.white);
         
         // Load the background image
-        backgroundImage = new ImageIcon("C:\\Users\\cubby\\eclipse-workspace\\swing\\resources\\background.jpg").getImage();
+        backgroundImage = new ImageIcon("swing/resources/background.jpg").getImage();
 
         // Create components
         startGameButton = new JButton();
