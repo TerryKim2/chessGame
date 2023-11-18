@@ -15,14 +15,13 @@ public class ChessLobby extends JFrame {
     private Image backgroundImage;
     private JLabel select;
     private JLabel chess;
-
+    
     public ChessLobby() {
         // Set up the JFrame
         setTitle("Chess Lobby");
         setSize(1920, 1080);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ImageIcon img = new ImageIcon("swing/resources/button_image.png");
-        
+        ImageIcon img = new ImageIcon("C:\\Users\\cubby\\git\\chessGame\\swing\\resources\\button_image.png");
         JLabel textLabel1 = new JLabel("PLAY");
         textLabel1.setFont(new Font("times", Font.BOLD, 50));
         textLabel1.setHorizontalAlignment(JLabel.CENTER);
@@ -49,7 +48,7 @@ public class ChessLobby extends JFrame {
         textLabel5.setForeground(Color.white);
         
         // Load the background image
-        backgroundImage = new ImageIcon("swing/resources/background.jpg").getImage();
+        backgroundImage = new ImageIcon("C:\\Users\\cubby\\git\\chessGame\\swing\\resources\\background.jpg").getImage();
 
         // Create components
         startGameButton = new JButton();
