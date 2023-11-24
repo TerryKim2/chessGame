@@ -4,11 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class ChessLobby extends JFrame {
 
     private JButton startGameButton;
     private JButton exitGameButton;
+    private JButton historyButton;
     private JButton easyButton;
     private JButton normalButton;
     private JButton hardButton;
@@ -20,13 +22,14 @@ public class ChessLobby extends JFrame {
         // Set up the JFrame
         setTitle("Chess Lobby");
         setSize(1920, 1080);
+        //setSize(1792, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ImageIcon img = new ImageIcon("C:\\Users\\cubby\\git\\chessGame\\swing\\resources\\button_image.png");
+        ImageIcon img = new ImageIcon("swing/resources/button_image.png");
         JLabel textLabel1 = new JLabel("PLAY");
         textLabel1.setFont(new Font("times", Font.BOLD, 50));
         textLabel1.setHorizontalAlignment(JLabel.CENTER);
         textLabel1.setForeground(Color.white);
-        
+
         JLabel textLabel2 = new JLabel("EXIT");
         textLabel2.setFont(new Font("times", Font.BOLD, 50	));
         textLabel2.setHorizontalAlignment(JLabel.CENTER);
@@ -46,13 +49,18 @@ public class ChessLobby extends JFrame {
         textLabel5.setFont(new Font("times", Font.BOLD, 50));
         textLabel5.setHorizontalAlignment(JLabel.CENTER);
         textLabel5.setForeground(Color.white);
+
+        JLabel textLabel6 = new JLabel("HISTORY");
+        textLabel6.setFont(new Font("times", Font.BOLD, 50));
+        textLabel6.setHorizontalAlignment(JLabel.CENTER);
+        textLabel6.setForeground(Color.white);
         
         // Load the background image
-        backgroundImage = new ImageIcon("C:\\Users\\cubby\\git\\chessGame\\swing\\resources\\background.jpg").getImage();
+        backgroundImage = new ImageIcon("swing/resources/background.jpg").getImage();
 
         // Create components
         startGameButton = new JButton();
-        startGameButton.setBounds(710, 403, 500, 150);
+        startGameButton.setBounds(710, 256, 500, 150);
         startGameButton.setIcon(img);
         startGameButton.setFont(new Font("times", Font.BOLD, 50));
         startGameButton.setForeground(Color.WHITE);
@@ -61,9 +69,20 @@ public class ChessLobby extends JFrame {
         startGameButton.setFocusPainted(false);
         startGameButton.setLayout(new BorderLayout());
         startGameButton.add(textLabel1, BorderLayout.CENTER);
+
+        historyButton = new JButton();
+        historyButton.setBounds(710, 506, 500, 150);
+        historyButton.setIcon(img);
+        historyButton.setFont(new Font("times", Font.BOLD, 50));
+        historyButton.setForeground(Color.WHITE);
+        historyButton.setBorderPainted(true);
+        historyButton.setContentAreaFilled(false);
+        historyButton.setFocusPainted(false);
+        historyButton.setLayout(new BorderLayout());
+        historyButton.add(textLabel6, BorderLayout.CENTER);
         
         exitGameButton = new JButton();
-        exitGameButton.setBounds(710, 726, 500, 150);
+        exitGameButton.setBounds(710, 756, 500, 150);
         exitGameButton.setIcon(img);
         exitGameButton.setFont(new Font("times", Font.BOLD, 50));
         exitGameButton.setForeground(Color.WHITE);
@@ -136,6 +155,7 @@ public class ChessLobby extends JFrame {
         contentPane1.add(chess);
         contentPane1.add(select);
         contentPane1.add(startGameButton);
+        contentPane1.add(historyButton);
         contentPane1.add(exitGameButton);
         contentPane1.add(easyButton);
         contentPane1.add(normalButton);
@@ -148,10 +168,23 @@ public class ChessLobby extends JFrame {
             public void actionPerformed(ActionEvent e) {
             	startGameButton.setVisible(false);
             	exitGameButton.setVisible(false);
+                historyButton.setVisible(false);
                 easyButton.setVisible(true);
                 normalButton.setVisible(true);
                 hardButton.setVisible(true);
                 select.setVisible(true);
+            }
+        });
+        historyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                HistoryGUI historyGUI = null;
+                try {
+                    historyGUI = new HistoryGUI();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                historyGUI.setVisible(true);
             }
         });
 
@@ -161,15 +194,26 @@ public class ChessLobby extends JFrame {
                 System.exit(0); // Exit the program
             }
         });
-        
-        /*startGameButton.addActionListener(new ActionListener() {
+
+        easyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 startGame(easyButton);
+            }
+        });
+        normalButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 startGame(normalButton);
+
+            }
+        });
+        hardButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 startGame(hardButton);
             }
-        });*/
+        });
         
         // Set the custom JPanel as the content pane of the JFrame
         setContentPane(contentPane1);
@@ -179,15 +223,7 @@ public class ChessLobby extends JFrame {
         String selectedDifficulty = difficultyButton.getText();
         // TODO: Implement game setup with the selected difficulty and transition to the chess game board
         System.out.println("Starting game with difficulty: " + selectedDifficulty);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                ChessLobby lobby = new ChessLobby();
-                lobby.setVisible(true);
-            }
-        });
+        ChessBoard chessBoard = new ChessBoard(selectedDifficulty);
+        chessBoard.setVisible(true);
     }
 }

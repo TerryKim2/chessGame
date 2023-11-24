@@ -11,7 +11,10 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -35,8 +38,10 @@ public class ChessBoard extends JFrame {
 	private JLabel turnLabel;
 	private JLabel lastMoveLabel;
 	private List<String> moveList = new ArrayList<>();
+	private String difficulty;
 
-	public ChessBoard() {
+	public ChessBoard(String difficulty) {
+		this.difficulty = difficulty;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(500, 500);
 		setLayout(new BorderLayout());
@@ -73,7 +78,7 @@ public class ChessBoard extends JFrame {
 	}
 
 	private void initializePieces(int row, int col) {
-		String basePath = System.getProperty("user.dir") + "\\src\\pieces\\"; // Replace with the actual path
+		String basePath = "swing/src/pieces/"; // Replace with the actual path
 		boolean isWhite = !(row < 2); // White pieces are in the first two rows
 		String colorPrefix = isWhite ? "w" : "b"; // 'w' for white, 'b' for black
 
@@ -298,7 +303,12 @@ public class ChessBoard extends JFrame {
 	private String getChessNotation(int row, int col) {
 	    return "" + (char)('a' + col) + (SIZE - row);
 	}
-	
+
+	//TODO call at the end of the game
+	private void saveGameResult(String result) throws SQLException {
+		ResultSet rs = DBManager.executeSQLquery("INSERT INTO games VALUES(DATE(\'now\'), TIME(\'now\'),"+difficulty+","+result);
+	}
+
 	private void saveMovesToFile(String filename) {		// Call at the end of a game
 	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
 	        for (String move : moveList) {
@@ -332,14 +342,14 @@ public class ChessBoard extends JFrame {
 	
 	
 	
-	public static void main(String[] args) throws IOException {
-
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				ChessBoard chessBoard = new ChessBoard();
-				chessBoard.setVisible(true);
-			}
-		});
-	}
+//	public static void main(String[] args) throws IOException {
+//
+//		SwingUtilities.invokeLater(new Runnable() {
+//			@Override
+//			public void run() {
+//				ChessBoard chessBoard = new ChessBoard();
+//				chessBoard.setVisible(true);
+//			}
+//		});
+//	}
 }
