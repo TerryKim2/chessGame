@@ -18,6 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -35,6 +36,9 @@ public class ChessBoard extends JFrame {
 	private JLabel turnLabel;
 	private JLabel lastMoveLabel;
 	private List<String> moveList = new ArrayList<>();
+	private MoveGenerator moveGenerator;
+	private Color ltan = new Color(227,193,111);
+	private Color dtan = new Color(184,139,74);
 
 	public ChessBoard() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -50,9 +54,9 @@ public class ChessBoard extends JFrame {
 				squares[row][col] = new JButton();
 				squares[row][col].addActionListener(new ButtonListener(row, col));
 				if ((row + col) % 2 == 0) {
-					squares[row][col].setBackground(Color.LIGHT_GRAY);
+					squares[row][col].setBackground(ltan);
 				} else {
-					squares[row][col].setBackground(Color.DARK_GRAY);
+					squares[row][col].setBackground(dtan);
 				}
 				chessBoardPanel.add(squares[row][col]);
 
@@ -64,12 +68,14 @@ public class ChessBoard extends JFrame {
 		// Status Bar
 		JPanel statusPanel = new JPanel(new BorderLayout());
 		turnLabel = new JLabel("White's turn", SwingConstants.CENTER);
-	    lastMoveLabel = new JLabel("Last Move: None", SwingConstants.LEFT);
+		lastMoveLabel = new JLabel("Last Move: None", SwingConstants.LEFT);
 
-	    statusPanel.add(turnLabel, BorderLayout.CENTER);
-	    statusPanel.add(lastMoveLabel, BorderLayout.WEST);
+		statusPanel.add(turnLabel, BorderLayout.CENTER);
+		statusPanel.add(lastMoveLabel, BorderLayout.WEST);
 
-	    add(statusPanel, BorderLayout.SOUTH);
+		add(statusPanel, BorderLayout.SOUTH);
+
+		moveGenerator = new MoveGenerator(boardState);
 	}
 
 	private void initializePieces(int row, int col) {
@@ -132,11 +138,32 @@ public class ChessBoard extends JFrame {
 
 	private void highlightValidMoves() {
 		List<Point> validMoves;
-		if (selectedPiece.type == ChessPiece.PieceType.PAWN) { // Assuming PAWN
-			validMoves = getValidPawnMoves(selectedRow, selectedCol);
-			for (Point move : validMoves) {
-				squares[move.x][move.y].setBackground(Color.GREEN); // Highlight square
-			}
+		switch (selectedPiece.getType()) {
+		case PAWN:
+			validMoves = moveGenerator.getValidPawnMoves(selectedRow, selectedCol);
+			break;
+		case ROOK:
+			validMoves = moveGenerator.getValidRookMoves(selectedRow, selectedCol);
+			break;
+		case BISHOP:
+			validMoves = moveGenerator.getValidBishopMoves(selectedRow, selectedCol);
+			break;
+		case QUEEN:
+			validMoves = moveGenerator.getValidQueenMoves(selectedRow, selectedCol);
+			break;
+		case KING:
+			validMoves = moveGenerator.getValidKingMoves(selectedRow, selectedCol);
+			break;
+		case KNIGHT:
+			validMoves = moveGenerator.getValidKnightMoves(selectedRow, selectedCol);
+			break;
+		default:
+			validMoves = new ArrayList<>();
+			break;
+		}
+
+		for (Point move : validMoves) {
+			squares[move.x][move.y].setBackground(Color.GREEN); // Highlight square
 		}
 		// Add similar conditions for other pieces
 	}
@@ -144,36 +171,58 @@ public class ChessBoard extends JFrame {
 	private void resetSquareHighlights() {
 		for (int row = 0; row < SIZE; row++) {
 			for (int col = 0; col < SIZE; col++) {
-				Color squareColor = (row + col) % 2 == 0 ? Color.LIGHT_GRAY : Color.DARK_GRAY;
+				Color squareColor = (row + col) % 2 == 0 ? ltan : dtan;
 				squares[row][col].setBackground(squareColor);
 			}
 		}
 	}
 
 	private void movePiece(int newRow, int newCol) {
+
 		if (selectedPiece != null && isValidMove(selectedRow, selectedCol, newRow, newCol)) {
-			// Update board state
+
+			if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && Math.abs(newRow - selectedRow) == 2) {
+				selectedPiece.pawnPassant(true);
+			}
+
+			if (isValidEnPassantMove(selectedRow, selectedCol, newRow, newCol)) {
+				// Remove the captured pawn in en passant
+				int capturedPawnRow = selectedRow; // The row where the captured pawn is
+				int capturedPawnCol = newCol; // The column to which the capturing pawn moved
+				boardState[capturedPawnRow][capturedPawnCol] = null;
+				squares[capturedPawnRow][capturedPawnCol].setIcon(null);
+			}
+
+			// Move the pawn
 			boardState[newRow][newCol] = selectedPiece;
 			boardState[selectedRow][selectedCol] = null;
-
-			// Update GUI
 			squares[newRow][newCol].setIcon(selectedPiece.getIcon());
 			squares[selectedRow][selectedCol].setIcon(null);
 
+			if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && (newRow == 0 || newRow == SIZE - 1)) {
+				ChessPiece.PieceType newType = promptForPawnPromotion();
+				String imagePath = getImagePathForPieceType(newType, selectedPiece.isWhite());
+				selectedPiece = new ChessPiece(imagePath, selectedPiece.isWhite(), newType);
+				boardState[newRow][newCol] = selectedPiece;
+				squares[newRow][newCol].setIcon(selectedPiece.getIcon());
+			}
+
 			// Switch turns and update the turn label
-	        isWhiteTurn = !isWhiteTurn;
-	        turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
+			isWhiteTurn = !isWhiteTurn;
+			turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
 
-	        // Update the last move label
-	        String move = getChessNotation(selectedRow, selectedCol) + " to " + getChessNotation(newRow, newCol);
-	        lastMoveLabel.setText("Last Move: " + move);
+			resetDoubleStepFlags(isWhiteTurn);
 
+			// Update the last move label
+			String move = getChessNotation(selectedRow, selectedCol) + " to " + getChessNotation(newRow, newCol);
+			lastMoveLabel.setText("Last Move: " + move);
 
 			// Reset selection and highlights
 			selectedPiece = null;
 			selectedRow = -1;
 			selectedCol = -1;
 			resetSquareHighlights();
+
 		} else {
 			selectedPiece = null;
 			selectedRow = -1;
@@ -182,24 +231,132 @@ public class ChessBoard extends JFrame {
 			indicateWrongMove(newRow, newCol);
 		}
 	}
-	
+
+	private ChessPiece.PieceType promptForPawnPromotion() {
+		Object[] possiblePieces = { "Queen", "Rook", "Bishop", "Knight" };
+		String chosenPiece = (String) JOptionPane.showInputDialog(this, "Choose piece for pawn promotion:",
+				"Pawn Promotion", JOptionPane.PLAIN_MESSAGE, null, possiblePieces, "Queen");
+
+		switch (chosenPiece) {
+		case "Rook":
+			return ChessPiece.PieceType.ROOK;
+		case "Bishop":
+			return ChessPiece.PieceType.BISHOP;
+		case "Knight":
+			return ChessPiece.PieceType.KNIGHT;
+		default:
+			return ChessPiece.PieceType.QUEEN;
+		}
+	}
+
+	private String getImagePathForPieceType(ChessPiece.PieceType type, boolean isWhite) {
+		String basePath = System.getProperty("user.dir") + "\\src\\pieces\\";
+		String colorPrefix = isWhite ? "w" : "b";
+		switch (type) {
+		case ROOK:
+			return basePath + colorPrefix + "rook.png";
+		case BISHOP:
+			return basePath + colorPrefix + "bishop.png";
+		case KNIGHT:
+			return basePath + colorPrefix + "knight.png";
+		case QUEEN:
+		default:
+			return basePath + colorPrefix + "queen.png";
+		}
+	}
+
+	private boolean isValidEnPassantMove(int currentRow, int currentCol, int targetRow, int targetCol) {
+		// Check if the selected piece is a pawn and the move is a valid en passant
+		// capture
+		return selectedPiece.getType() == ChessPiece.PieceType.PAWN
+				&& moveGenerator.isEnPassant(currentRow, currentCol, targetRow, targetCol);
+	}
+
+	private void resetDoubleStepFlags(boolean isWhiteTurnNow) {
+		for (int r = 0; r < SIZE; r++) {
+			for (int c = 0; c < SIZE; c++) {
+				ChessPiece piece = boardState[r][c];
+				if (piece != null && piece.getType() == ChessPiece.PieceType.PAWN
+						&& piece.isWhite() == isWhiteTurnNow) {
+					piece.pawnPassant(false);
+				}
+			}
+		}
+	}
+
 	private boolean isValidMove(int startX, int startY, int endX, int endY) {
-		List<Point> temp = new ArrayList<>();
-		temp.add(new Point(endX, endY));
+		Point temp = new Point(endX, endY);
+		System.out.println("Input Move: (" + temp.x + "," + temp.y + ")");
+
 		if (selectedPiece.type == ChessPiece.PieceType.PAWN) {
-			System.out.println("selected a pawn");
-			List<Point> pawn = new ArrayList<>(getValidPawnMoves(startX, startY));
-			for (int i = 0; i < pawn.size(); i++) {
-				System.out.println("temp: " + temp.get(0));
-				System.out.println(pawn.get(i));
-				if (temp.get(0).equals(pawn.get(i))) {
-					System.out.println("test");
+			System.out.println("Selected a pawn.");
+			List<Point> pawn = new ArrayList<>(moveGenerator.getValidPawnMoves(startX, startY));
+			System.out.print("Possible Moves: ");
+			for (Point p : pawn) {
+				System.out.print("(" + p.x + "," + p.y + ")");
+				if (temp.equals(p)) {
+					System.out.println("\nReturning True.");
+					return true;
+				}
+			}
+		} else if (selectedPiece.type == ChessPiece.PieceType.ROOK) {
+			System.out.println("Selected a rook.");
+			List<Point> rook = new ArrayList<>(moveGenerator.getValidRookMoves(startX, startY));
+			System.out.print("Possible Moves: ");
+			for (Point p : rook) {
+				System.out.print("(" + p.x + "," + p.y + ")");
+				if (temp.equals(p)) {
+					System.out.println("\nReturning True.");
 					return true;
 				}
 			}
 
+		} else if (selectedPiece.type == ChessPiece.PieceType.BISHOP) {
+			System.out.println("Selected a bishop.");
+			List<Point> bishop = new ArrayList<>(moveGenerator.getValidBishopMoves(startX, startY));
+			System.out.print("Possible Moves: ");
+			for (Point p : bishop) {
+				System.out.print("(" + p.x + "," + p.y + ")");
+				if (temp.equals(p)) {
+					System.out.println("\nReturning True.");
+					return true;
+				}
+			}
+		} else if (selectedPiece.type == ChessPiece.PieceType.QUEEN) {
+			System.out.println("Selected a queen.");
+			List<Point> queen = new ArrayList<>(moveGenerator.getValidQueenMoves(startX, startY));
+			System.out.print("Possible Moves: ");
+			for (Point p : queen) {
+				System.out.print("(" + p.x + "," + p.y + ")");
+				if (temp.equals(p)) {
+					System.out.println("\nReturning True.");
+					return true;
+				}
+			}
+		} else if (selectedPiece.type == ChessPiece.PieceType.KING) {
+			System.out.println("Selected a king.");
+			List<Point> king = new ArrayList<>(moveGenerator.getValidKingMoves(startX, startY));
+			System.out.print("Possible Moves: ");
+			for (Point p : king) {
+				System.out.print("(" + p.x + "," + p.y + ")");
+				if (temp.equals(p)) {
+					System.out.println("\nReturning True.");
+					return true;
+				}
+			}
+		} else if (selectedPiece.type == ChessPiece.PieceType.KNIGHT) {
+			System.out.println("Selected a knight.");
+			List<Point> knight = new ArrayList<>(moveGenerator.getValidKnightMoves(startX, startY));
+			System.out.print("Possible Moves: ");
+			for (Point p : knight) {
+				System.out.print("(" + p.x + "," + p.y + ")");
+				if (temp.equals(p)) {
+					System.out.println("\nReturning True.");
+					return true;
+				}
+			}
 		}
-		System.out.println("returning false");
+		System.out.println("\nReturning false.");
 		return false;
 	}
 
@@ -228,46 +385,11 @@ public class ChessBoard extends JFrame {
 		timer.start();
 	}
 
-	private List<Point> getValidPawnMoves(int row, int col) {
-		List<Point> validMoves = new ArrayList<>();
-		int direction = boardState[row][col].isWhite() ? -1 : 1; // White moves up, Black moves down
-		int startRow = boardState[row][col].isWhite() ? 6 : 1; // Starting rows for White and Black
-
-		// Move one square forward
-		if (isSquareEmpty(row + direction, col)) {
-			validMoves.add(new Point(row + direction, col));
-
-			// Move two squares forward from the starting position
-			if (row == startRow && isSquareEmpty(row + 2 * direction, col)) {
-				validMoves.add(new Point(row + 2 * direction, col));
-			}
-		}
-
-		// Capture diagonally
-		if (isWithinBoard(row + direction, col - 1) && !isSquareEmpty(row + direction, col - 1)
-				&& boardState[row][col].isWhite() != boardState[row + direction][col - 1].isWhite()) {
-			validMoves.add(new Point(row + direction, col - 1));
-		}
-		if (isWithinBoard(row + direction, col + 1) && !isSquareEmpty(row + direction, col + 1)
-				&& boardState[row][col].isWhite() != boardState[row + direction][col + 1].isWhite()) {
-			validMoves.add(new Point(row + direction, col + 1));
-		}
-
-		return validMoves;
-	}
-
-	private boolean isSquareEmpty(int row, int col) {
-		return isWithinBoard(row, col) && boardState[row][col] == null;
-	}
-
-	private boolean isWithinBoard(int row, int col) {
-		return row >= 0 && row < SIZE && col >= 0 && col < SIZE;
-	}
-
-	class ChessPiece {
+	public class ChessPiece {
 		private ImageIcon icon;
 		private boolean isWhite;
 		private PieceType type;
+		private boolean madeDoubleMove = false;
 
 		public enum PieceType {
 			PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING
@@ -290,48 +412,53 @@ public class ChessBoard extends JFrame {
 		public PieceType getType() {
 			return type;
 		}
+
+		public void pawnPassant(boolean doubleMove) {
+			this.madeDoubleMove = doubleMove;
+		}
+
+		public boolean doubleMoved() {
+			return madeDoubleMove;
+		}
 	}
 
-	
-	
 	// Methods for storing game information and replaying them
 	private String getChessNotation(int row, int col) {
-	    return "" + (char)('a' + col) + (SIZE - row);
-	}
-	
-	private void saveMovesToFile(String filename) {		// Call at the end of a game
-	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-	        for (String move : moveList) {
-	            writer.write(move);
-	            writer.newLine();
-	        }
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
+		return "" + (char) ('a' + col) + (SIZE - row);
 	}
 
-	private void replayMovesFromFile(String filename) {		//Call from lobby???
-	    try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-	        String line;
-	        while ((line = reader.readLine()) != null) {
-	            // Process and simulate each move
-	            simulateMove(line);
-	        }
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
+	private void saveMovesToFile(String filename) { // Call at the end of a game
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+			for (String move : moveList) {
+				writer.write(move);
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void replayMovesFromFile(String filename) { // Call from lobby???
+		try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				// Process and simulate each move
+				simulateMove(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void simulateMove(String moveNotation) {
-	    // Extract starting and ending positions from moveNotation and simulate the move
-	    // This will involve parsing the string, finding the corresponding squares on the board,
-	    // and then moving the pieces accordingly.
-		// Possibly include either a timer to slow the movements or a button to go step by step. 
+		// Extract starting and ending positions from moveNotation and simulate the move
+		// This will involve parsing the string, finding the corresponding squares on
+		// the board,
+		// and then moving the pieces accordingly.
+		// Possibly include either a timer to slow the movements or a button to go step
+		// by step.
 	}
 
-	
-	
-	
 	public static void main(String[] args) throws IOException {
 
 		SwingUtilities.invokeLater(new Runnable() {
