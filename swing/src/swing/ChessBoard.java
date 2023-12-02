@@ -284,7 +284,7 @@ public class ChessBoard extends JFrame {
 		}
 	}
 
-	private boolean isValidMove(int startX, int startY, int endX, int endY) {
+	public boolean isValidMove(int startX, int startY, int endX, int endY) {
 		Point temp = new Point(endX, endY);
 		System.out.println("Input Move: (" + temp.x + "," + temp.y + ")");
 
