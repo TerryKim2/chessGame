@@ -23,6 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import swing.ChessLobby;
+import swing.aiControl;
 
 public class ChessBoard extends JFrame {
 
@@ -40,6 +42,14 @@ public class ChessBoard extends JFrame {
 	private Color ltan = new Color(227,193,111);
 	private Color dtan = new Color(184,139,74);
 
+    public boolean playerColor;//true = white, false = black
+    public boolean aiColor;
+    
+    public aiControl ai;
+    public ChessPiece[][] d() {
+    	return boardState;
+    }
+	
 	public ChessBoard() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(500, 500);
@@ -76,6 +86,14 @@ public class ChessBoard extends JFrame {
 		add(statusPanel, BorderLayout.SOUTH);
 
 		moveGenerator = new MoveGenerator(boardState);
+		ai = new aiControl();
+		if(playerColor != true) {
+			ai.myColor = true;
+			ai.controller(this);
+		} else {
+			
+		}
+		
 	}
 
 	private void initializePieces(int row, int col) {
@@ -121,8 +139,8 @@ public class ChessBoard extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (selectedPiece == null && boardState[row][col] != null) {
-				if ((isWhiteTurn && boardState[row][col].isWhite())
-						|| (!isWhiteTurn && !boardState[row][col].isWhite())) {
+				if ((isWhiteTurn && boardState[row][col].isWhite() && playerColor == true)
+						|| (!isWhiteTurn && !boardState[row][col].isWhite() && playerColor == false)) {
 					selectedPiece = boardState[row][col];
 					selectedRow = row;
 					selectedCol = col;
@@ -178,8 +196,8 @@ public class ChessBoard extends JFrame {
 	}
 
 	private void movePiece(int newRow, int newCol) {
-
-		if (selectedPiece != null && isValidMove(selectedRow, selectedCol, newRow, newCol)) {
+		if(selectedPiece != null) {
+		if (isValidMove(selectedRow, selectedCol, newRow, newCol, selectedPiece) && selectedPiece.isWhite == playerColor) {
 
 			if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && Math.abs(newRow - selectedRow) == 2) {
 				selectedPiece.pawnPassant(true);
@@ -229,6 +247,7 @@ public class ChessBoard extends JFrame {
 			selectedCol = -1;
 			resetSquareHighlights();
 			indicateWrongMove(newRow, newCol);
+		}
 		}
 	}
 
@@ -284,10 +303,11 @@ public class ChessBoard extends JFrame {
 		}
 	}
 
-	public boolean isValidMove(int startX, int startY, int endX, int endY) {
+	public boolean isValidMove(int startX, int startY, int endX, int endY, ChessPiece piece) {
+		
 		Point temp = new Point(endX, endY);
 		System.out.println("Input Move: (" + temp.x + "," + temp.y + ")");
-
+		
 		if (selectedPiece.type == ChessPiece.PieceType.PAWN) {
 			System.out.println("Selected a pawn.");
 			List<Point> pawn = new ArrayList<>(moveGenerator.getValidPawnMoves(startX, startY));
@@ -459,7 +479,7 @@ public class ChessBoard extends JFrame {
 		// by step.
 	}
 
-	public static void main(String[] args) throws IOException {
+	/*public static void main(String[] args) throws IOException {
 
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -468,5 +488,5 @@ public class ChessBoard extends JFrame {
 				chessBoard.setVisible(true);
 			}
 		});
-	}
+	}*/
 }

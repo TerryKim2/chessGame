@@ -17,7 +17,7 @@ public class ChessLobby extends JFrame {
     private Image backgroundImage;
     private JLabel select;
     private JLabel chess;
-    
+    public boolean white;
     public ChessLobby() {
         // Set up the JFrame
         setTitle("Chess Lobby");
@@ -245,6 +245,8 @@ public class ChessLobby extends JFrame {
             public void actionPerformed(ActionEvent e) {
             	dispose();
             	ChessBoard board = new ChessBoard();
+            	board.playerColor = false;
+            	board.aiColor = true;
             	board.setVisible(true);
             }
         });
@@ -252,9 +254,10 @@ public class ChessLobby extends JFrame {
         wButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	
             	dispose();
             	ChessBoard board = new ChessBoard();
+            	board.playerColor = true;
+            	board.aiColor = false;
             	board.setVisible(true);
             }
         });
