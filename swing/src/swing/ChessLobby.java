@@ -190,14 +190,14 @@ public class ChessLobby extends JFrame {
                 select.setVisible(true);
             }
         });
-
+        //exit button
         exitGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0); // Exit the program
             }
         });
-        
+        //easy
         easyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -211,7 +211,7 @@ public class ChessLobby extends JFrame {
                 bButton.setVisible(true);
             }
         });
-        
+        //normal
         normalButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -225,7 +225,7 @@ public class ChessLobby extends JFrame {
                 bButton.setVisible(true);
             }
         });
-        
+        //hard
         hardButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -239,25 +239,21 @@ public class ChessLobby extends JFrame {
                 bButton.setVisible(true);
             }
         });
-        
+        //select player color as black
         bButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
             	dispose();
-            	ChessBoard board = new ChessBoard();
-            	board.playerColor = false;
-            	board.aiColor = true;
+            	ChessBoard board = new ChessBoard(false);
             	board.setVisible(true);
             }
         });
-        
+        //select player color as white
         wButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
             	dispose();
-            	ChessBoard board = new ChessBoard();
-            	board.playerColor = true;
-            	board.aiColor = false;
+            	ChessBoard board = new ChessBoard(true);
             	board.setVisible(true);
             }
         });
@@ -265,7 +261,7 @@ public class ChessLobby extends JFrame {
         
         setContentPane(contentPane1);
     }
-
+    //game start button
     private void startGame(JButton difficultyButton) {
         String selectedDifficulty = difficultyButton.getText();
         // TODO: Implement game setup with the selected difficulty and transition to the chess game board

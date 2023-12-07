@@ -39,18 +39,22 @@ public class ChessBoard extends JFrame {
 	private JLabel lastMoveLabel;
 	private List<String> moveList = new ArrayList<>();
 	private MoveGenerator moveGenerator;
-	private Color ltan = new Color(227,193,111);
-	private Color dtan = new Color(184,139,74);
+	private Color ltan = new Color(227, 193, 111);
+	private Color dtan = new Color(184, 139, 74);
+	public boolean turn = true;
 
-    public boolean playerColor;//true = white, false = black
-    public boolean aiColor;
-    
-    public aiControl ai;
-    public ChessPiece[][] d() {
-    	return boardState;
-    }
-	
-	public ChessBoard() {
+	public boolean playerColor;// true = white, false = black
+	public boolean aiColor;
+
+	public aiControl ai;
+
+	public ChessPiece[][] d() {
+		return boardState;
+	}
+
+	public ChessBoard(boolean info) {
+		this.playerColor = info;
+		this.aiColor = !info;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(500, 500);
 		setLayout(new BorderLayout());
@@ -87,13 +91,22 @@ public class ChessBoard extends JFrame {
 
 		moveGenerator = new MoveGenerator(boardState);
 		ai = new aiControl();
-		if(playerColor != true) {
-			ai.myColor = true;
-			ai.controller(this);
-		} else {
-			
+		ai.myColor = aiColor;
+		if (turn == aiColor) {
+			ai.controller(this, moveGenerator, boardState);
 		}
-		
+
+	}
+
+
+	
+	public void gameManager() {
+		//turn true면 플레이어 턴
+		if(turn == true) {
+			
+		} else if (turn == false) {
+			ai.controller(this, moveGenerator, boardState);
+		}
 	}
 
 	private void initializePieces(int row, int col) {
@@ -138,18 +151,21 @@ public class ChessBoard extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (selectedPiece == null && boardState[row][col] != null) {
-				if ((isWhiteTurn && boardState[row][col].isWhite() && playerColor == true)
-						|| (!isWhiteTurn && !boardState[row][col].isWhite() && playerColor == false)) {
-					selectedPiece = boardState[row][col];
-					selectedRow = row;
-					selectedCol = col;
-					highlightValidMoves();
+			if (turn == true) {
+				if (selectedPiece == null && boardState[row][col] != null) {
+					if ((isWhiteTurn && boardState[row][col].isWhite() && playerColor == true)
+							|| (!isWhiteTurn && !boardState[row][col].isWhite() && playerColor == false)) {
+						selectedPiece = boardState[row][col];
+						selectedRow = row;
+						selectedCol = col;
+						highlightValidMoves();
+					}
+				} else if (selectedPiece != null) {
+					// Move piece and reset highlights
+					resetSquareHighlights();
+					movePiece(row, col);
+					
 				}
-			} else if (selectedPiece != null) {
-				// Move piece and reset highlights
-				resetSquareHighlights();
-				movePiece(row, col);
 			}
 		}
 	}
@@ -162,6 +178,8 @@ public class ChessBoard extends JFrame {
 			break;
 		case ROOK:
 			validMoves = moveGenerator.getValidRookMoves(selectedRow, selectedCol);
+			if(validMoves.isEmpty()) {
+			System.out.println("empty");}
 			break;
 		case BISHOP:
 			validMoves = moveGenerator.getValidBishopMoves(selectedRow, selectedCol);
@@ -196,58 +214,128 @@ public class ChessBoard extends JFrame {
 	}
 
 	private void movePiece(int newRow, int newCol) {
-		if(selectedPiece != null) {
-		if (isValidMove(selectedRow, selectedCol, newRow, newCol, selectedPiece) && selectedPiece.isWhite == playerColor) {
+		if (selectedPiece != null) {
+			if (isValidMove(selectedRow, selectedCol, newRow, newCol, selectedPiece)
+					&& selectedPiece.isWhite == playerColor) {
 
-			if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && Math.abs(newRow - selectedRow) == 2) {
-				selectedPiece.pawnPassant(true);
-			}
+				if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && Math.abs(newRow - selectedRow) == 2) {
+					selectedPiece.pawnPassant(true);
+				}
 
-			if (isValidEnPassantMove(selectedRow, selectedCol, newRow, newCol)) {
-				// Remove the captured pawn in en passant
-				int capturedPawnRow = selectedRow; // The row where the captured pawn is
-				int capturedPawnCol = newCol; // The column to which the capturing pawn moved
-				boardState[capturedPawnRow][capturedPawnCol] = null;
-				squares[capturedPawnRow][capturedPawnCol].setIcon(null);
-			}
+				if (isValidEnPassantMove(selectedRow, selectedCol, newRow, newCol)) {
+					// Remove the captured pawn in en passant
+					int capturedPawnRow = selectedRow; // The row where the captured pawn is
+					int capturedPawnCol = newCol; // The column to which the capturing pawn moved
+					boardState[capturedPawnRow][capturedPawnCol] = null;
+					squares[capturedPawnRow][capturedPawnCol].setIcon(null);
+				}
 
-			// Move the pawn
-			boardState[newRow][newCol] = selectedPiece;
-			boardState[selectedRow][selectedCol] = null;
-			squares[newRow][newCol].setIcon(selectedPiece.getIcon());
-			squares[selectedRow][selectedCol].setIcon(null);
-
-			if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && (newRow == 0 || newRow == SIZE - 1)) {
-				ChessPiece.PieceType newType = promptForPawnPromotion();
-				String imagePath = getImagePathForPieceType(newType, selectedPiece.isWhite());
-				selectedPiece = new ChessPiece(imagePath, selectedPiece.isWhite(), newType);
+				// Move the pawn
 				boardState[newRow][newCol] = selectedPiece;
+				boardState[selectedRow][selectedCol] = null;
 				squares[newRow][newCol].setIcon(selectedPiece.getIcon());
+				squares[selectedRow][selectedCol].setIcon(null);
+
+				if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && (newRow == 0 || newRow == SIZE - 1)) {
+					ChessPiece.PieceType newType = promptForPawnPromotion();
+					String imagePath = getImagePathForPieceType(newType, selectedPiece.isWhite());
+					selectedPiece = new ChessPiece(imagePath, selectedPiece.isWhite(), newType);
+					boardState[newRow][newCol] = selectedPiece;
+					squares[newRow][newCol].setIcon(selectedPiece.getIcon());
+				}
+
+				// Switch turns and update the turn label
+				isWhiteTurn = !isWhiteTurn;
+				turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
+
+				resetDoubleStepFlags(isWhiteTurn);
+
+				// Update the last move label
+				String move = getChessNotation(selectedRow, selectedCol) + " to " + getChessNotation(newRow, newCol);
+				lastMoveLabel.setText("Last Move: " + move);
+
+				// Reset selection and highlights
+				selectedPiece = null;
+				selectedRow = -1;
+				selectedCol = -1;
+				resetSquareHighlights();
+				turn = false;
+				gameManager();
+			} else {
+				selectedPiece = null;
+				selectedRow = -1;
+				selectedCol = -1;
+				resetSquareHighlights();
+				indicateWrongMove(newRow, newCol);
+				gameManager();
 			}
-
-			// Switch turns and update the turn label
-			isWhiteTurn = !isWhiteTurn;
-			turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
-
-			resetDoubleStepFlags(isWhiteTurn);
-
-			// Update the last move label
-			String move = getChessNotation(selectedRow, selectedCol) + " to " + getChessNotation(newRow, newCol);
-			lastMoveLabel.setText("Last Move: " + move);
-
-			// Reset selection and highlights
-			selectedPiece = null;
-			selectedRow = -1;
-			selectedCol = -1;
-			resetSquareHighlights();
-
-		} else {
-			selectedPiece = null;
-			selectedRow = -1;
-			selectedCol = -1;
-			resetSquareHighlights();
-			indicateWrongMove(newRow, newCol);
 		}
+	}
+	
+	//aiMove(piece)
+	/*In order to distinguish the movement of the player and ai, 
+	 * it was modified to be used in ai control after copying it with the movepiece method.
+	 */
+	public void aiMovePiece(ChessPiece k, int newRow, int newCol) {
+		selectedPiece = k;
+
+		if (selectedPiece != null) {
+			
+			if (isValidMove(k.points.x, k.points.y, newRow, newCol, selectedPiece)
+					&& selectedPiece.isWhite == aiColor) {
+
+				if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && Math.abs(newRow - k.points.y) == 2) {
+					selectedPiece.pawnPassant(true);
+				}
+
+				if (isValidEnPassantMove(k.points.x, k.points.y, newRow, newCol)) {
+					// Remove the captured pawn in en passant
+					int capturedPawnRow = k.points.x; // The row where the captured pawn is
+					int capturedPawnCol = newCol; // The column to which the capturing pawn moved
+					boardState[capturedPawnRow][capturedPawnCol] = null;
+					squares[capturedPawnRow][capturedPawnCol].setIcon(null);
+				}
+				
+
+				// Move the pawn
+				boardState[newRow][newCol] = selectedPiece;
+				boardState[k.points.x][k.points.y] = null;
+				squares[newRow][newCol].setIcon(selectedPiece.getIcon());
+				squares[k.points.x][k.points.y].setIcon(null);
+				
+				if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && (newRow == 0 || newRow == SIZE - 1)) {
+					ChessPiece.PieceType newType = promptForPawnPromotion();
+					String imagePath = getImagePathForPieceType(newType, selectedPiece.isWhite());
+					selectedPiece = new ChessPiece(imagePath, selectedPiece.isWhite(), newType);
+					boardState[newRow][newCol] = selectedPiece;
+					squares[newRow][newCol].setIcon(selectedPiece.getIcon());
+				}
+
+				// Switch turns and update the turn label
+				isWhiteTurn = !isWhiteTurn;
+				turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
+
+				resetDoubleStepFlags(isWhiteTurn);
+
+				// Update the last move label
+				String move = getChessNotation(k.points.x, k.points.y) + " to " + getChessNotation(newRow, newCol);
+				lastMoveLabel.setText("Last Move: " + move);
+
+				// Reset selection and highlights
+				selectedPiece = null;
+				k.points.x = -1;
+				k.points.y = -1;
+				resetSquareHighlights();
+				turn = true;
+				gameManager();
+			} else {
+				selectedPiece = null;
+				k.points.x = -1;
+				k.points.y = -1;
+				resetSquareHighlights();
+				indicateWrongMove(newRow, newCol);
+				gameManager();
+			}
 		}
 	}
 
@@ -304,10 +392,10 @@ public class ChessBoard extends JFrame {
 	}
 
 	public boolean isValidMove(int startX, int startY, int endX, int endY, ChessPiece piece) {
-		
+
 		Point temp = new Point(endX, endY);
 		System.out.println("Input Move: (" + temp.x + "," + temp.y + ")");
-		
+
 		if (selectedPiece.type == ChessPiece.PieceType.PAWN) {
 			System.out.println("Selected a pawn.");
 			List<Point> pawn = new ArrayList<>(moveGenerator.getValidPawnMoves(startX, startY));
@@ -410,6 +498,7 @@ public class ChessBoard extends JFrame {
 		private boolean isWhite;
 		private PieceType type;
 		private boolean madeDoubleMove = false;
+		public Point points;
 
 		public enum PieceType {
 			PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING
@@ -439,6 +528,10 @@ public class ChessBoard extends JFrame {
 
 		public boolean doubleMoved() {
 			return madeDoubleMove;
+		}
+		//I also needed quite a bit of information about the point, so I made it.
+		public Point getPoints() {
+			return points;
 		}
 	}
 
@@ -479,14 +572,12 @@ public class ChessBoard extends JFrame {
 		// by step.
 	}
 
-	/*public static void main(String[] args) throws IOException {
-
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				ChessBoard chessBoard = new ChessBoard();
-				chessBoard.setVisible(true);
-			}
-		});
-	}*/
+	/*
+	 * public static void main(String[] args) throws IOException {
+	 * 
+	 * SwingUtilities.invokeLater(new Runnable() {
+	 * 
+	 * @Override public void run() { ChessBoard chessBoard = new ChessBoard();
+	 * chessBoard.setVisible(true); } }); }
+	 */
 }
