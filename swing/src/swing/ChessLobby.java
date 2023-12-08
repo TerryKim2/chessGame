@@ -14,17 +14,22 @@ public class ChessLobby extends JFrame {
     private JButton easyButton;
     private JButton normalButton;
     private JButton hardButton;
+    private JButton bButton;
+    private JButton wButton;
     private Image backgroundImage;
     private JLabel select;
     private JLabel chess;
-    
+    public boolean white;
+    public boolean easy;
     public ChessLobby() {
         // Set up the JFrame
         setTitle("Chess Lobby");
         setSize(1920, 1080);
         //setSize(1792, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ImageIcon img = new ImageIcon("swing/resources/button_image.png");
+
+        ImageIcon img = new ImageIcon(System.getProperty("user.dir")+"\\resources\\button_image.png");
+
         JLabel textLabel1 = new JLabel("PLAY");
         textLabel1.setFont(new Font("times", Font.BOLD, 50));
         textLabel1.setHorizontalAlignment(JLabel.CENTER);
@@ -55,8 +60,20 @@ public class ChessLobby extends JFrame {
         textLabel6.setHorizontalAlignment(JLabel.CENTER);
         textLabel6.setForeground(Color.white);
         
+        JLabel textLabel6 = new JLabel("WHITE");
+        textLabel6.setFont(new Font("times", Font.BOLD, 50));
+        textLabel6.setHorizontalAlignment(JLabel.CENTER);
+        textLabel6.setForeground(Color.white);
+        
+        JLabel textLabel7 = new JLabel("BLACK");
+        textLabel7.setFont(new Font("times", Font.BOLD, 50));
+        textLabel7.setHorizontalAlignment(JLabel.CENTER);
+        textLabel7.setForeground(Color.white);
+        
         // Load the background image
-        backgroundImage = new ImageIcon("swing/resources/background.jpg").getImage();
+
+        backgroundImage = new ImageIcon(System.getProperty("user.dir")+"\\resources\\background.jpg").getImage();
+
 
         // Create components
         startGameButton = new JButton();
@@ -141,7 +158,29 @@ public class ChessLobby extends JFrame {
         select.setForeground(Color.getHSBColor(51, 100, 100));
         select.setVisible(false);
 
+        wButton = new JButton();
+        wButton.setBounds(710, 403, 500, 150);
+        wButton.setIcon(img);
+        wButton.setFont(new Font("times", Font.BOLD, 50));
+        wButton.setForeground(Color.WHITE);
+        wButton.setBorderPainted(true);
+        wButton.setContentAreaFilled(false);
+        wButton.setFocusPainted(false);
+        wButton.setLayout(new BorderLayout());
+        wButton.add(textLabel6, BorderLayout.CENTER);
+        wButton.setVisible(false);
         
+        bButton = new JButton();
+        bButton.setBounds(710, 726, 500, 150);
+        bButton.setIcon(img);
+        bButton.setFont(new Font("times", Font.BOLD, 50));
+        bButton.setForeground(Color.WHITE);
+        bButton.setBorderPainted(true);
+        bButton.setContentAreaFilled(false);
+        bButton.setFocusPainted(false);
+        bButton.setLayout(new BorderLayout());
+        bButton.add(textLabel7, BorderLayout.CENTER);
+        bButton.setVisible(false);
         
         // Add components to a custom JPane2
         JPanel contentPane1 = new JPanel() {
@@ -160,6 +199,8 @@ public class ChessLobby extends JFrame {
         contentPane1.add(easyButton);
         contentPane1.add(normalButton);
         contentPane1.add(hardButton);
+        contentPane1.add(wButton);
+        contentPane1.add(bButton);
         
 
         // Add ActionListener to the Start Game button
@@ -175,6 +216,7 @@ public class ChessLobby extends JFrame {
                 select.setVisible(true);
             }
         });
+
         historyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -188,6 +230,9 @@ public class ChessLobby extends JFrame {
             }
         });
 
+
+        //exit button
+
         exitGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -195,30 +240,74 @@ public class ChessLobby extends JFrame {
             }
         });
 
+        //easy
         easyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                startGame(easyButton);
+            	startGameButton.setVisible(false);
+            	exitGameButton.setVisible(false);
+                easyButton.setVisible(false);
+                normalButton.setVisible(false);
+                hardButton.setVisible(false);
+                select.setVisible(false);
+                wButton.setVisible(true);
+                bButton.setVisible(true);
+                easy = true;
             }
         });
+        //normal
         normalButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                startGame(normalButton);
-
+            	startGameButton.setVisible(false);
+            	exitGameButton.setVisible(false);
+                easyButton.setVisible(false);
+                normalButton.setVisible(false);
+                hardButton.setVisible(false);
+                select.setVisible(false);
+                wButton.setVisible(true);
+                bButton.setVisible(true);
+                easy = false;
             }
         });
+        //hard
         hardButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                startGame(hardButton);
+            	startGameButton.setVisible(false);
+            	exitGameButton.setVisible(false);
+                easyButton.setVisible(false);
+                normalButton.setVisible(false);
+                hardButton.setVisible(false);
+                select.setVisible(false);
+                wButton.setVisible(true);
+                bButton.setVisible(true);
+            }
+        });
+        //select player color as black
+        bButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	dispose();
+            	ChessBoard board = new ChessBoard(false, easy);
+            	board.setVisible(true);
+            }
+        });
+        //select player color as white
+        wButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	dispose();
+            	ChessBoard board = new ChessBoard(true, easy);
+            	board.setVisible(true);
             }
         });
         
-        // Set the custom JPanel as the content pane of the JFrame
+
+        
         setContentPane(contentPane1);
     }
-
+    //game start button
     private void startGame(JButton difficultyButton) {
         String selectedDifficulty = difficultyButton.getText();
         // TODO: Implement game setup with the selected difficulty and transition to the chess game board
