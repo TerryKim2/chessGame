@@ -18,12 +18,13 @@ public class ChessLobby extends JFrame {
     private JLabel select;
     private JLabel chess;
     public boolean white;
+    public boolean easy;
     public ChessLobby() {
         // Set up the JFrame
         setTitle("Chess Lobby");
         setSize(1920, 1080);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ImageIcon img = new ImageIcon("C:\\Users\\cubby\\git\\chessGame\\swing\\resources\\button_image.png");
+        ImageIcon img = new ImageIcon(System.getProperty("user.dir")+"\\resources\\button_image.png");
         JLabel textLabel1 = new JLabel("PLAY");
         textLabel1.setFont(new Font("times", Font.BOLD, 50));
         textLabel1.setHorizontalAlignment(JLabel.CENTER);
@@ -60,7 +61,7 @@ public class ChessLobby extends JFrame {
         textLabel7.setForeground(Color.white);
         
         // Load the background image
-        backgroundImage = new ImageIcon("C:\\Users\\cubby\\git\\chessGame\\swing\\resources\\background.jpg").getImage();
+        backgroundImage = new ImageIcon(System.getProperty("user.dir")+"\\resources\\background.jpg").getImage();
 
         // Create components
         startGameButton = new JButton();
@@ -209,6 +210,7 @@ public class ChessLobby extends JFrame {
                 select.setVisible(false);
                 wButton.setVisible(true);
                 bButton.setVisible(true);
+                easy = true;
             }
         });
         //normal
@@ -223,6 +225,7 @@ public class ChessLobby extends JFrame {
                 select.setVisible(false);
                 wButton.setVisible(true);
                 bButton.setVisible(true);
+                easy = false;
             }
         });
         //hard
@@ -244,7 +247,7 @@ public class ChessLobby extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
             	dispose();
-            	ChessBoard board = new ChessBoard(false);
+            	ChessBoard board = new ChessBoard(false, easy);
             	board.setVisible(true);
             }
         });
@@ -253,7 +256,7 @@ public class ChessLobby extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
             	dispose();
-            	ChessBoard board = new ChessBoard(true);
+            	ChessBoard board = new ChessBoard(true, easy);
             	board.setVisible(true);
             }
         });
