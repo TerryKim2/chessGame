@@ -55,10 +55,10 @@ public class ChessLobby extends JFrame {
         textLabel5.setHorizontalAlignment(JLabel.CENTER);
         textLabel5.setForeground(Color.white);
 
-        JLabel textLabel6 = new JLabel("HISTORY");
-        textLabel6.setFont(new Font("times", Font.BOLD, 50));
-        textLabel6.setHorizontalAlignment(JLabel.CENTER);
-        textLabel6.setForeground(Color.white);
+        JLabel textLabel8 = new JLabel("HISTORY");
+        textLabel8.setFont(new Font("times", Font.BOLD, 50));
+        textLabel8.setHorizontalAlignment(JLabel.CENTER);
+        textLabel8.setForeground(Color.white);
         
         JLabel textLabel6 = new JLabel("WHITE");
         textLabel6.setFont(new Font("times", Font.BOLD, 50));
@@ -96,7 +96,7 @@ public class ChessLobby extends JFrame {
         historyButton.setContentAreaFilled(false);
         historyButton.setFocusPainted(false);
         historyButton.setLayout(new BorderLayout());
-        historyButton.add(textLabel6, BorderLayout.CENTER);
+        historyButton.add(textLabel8, BorderLayout.CENTER);
         
         exitGameButton = new JButton();
         exitGameButton.setBounds(710, 756, 500, 150);
