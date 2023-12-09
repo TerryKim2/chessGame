@@ -24,7 +24,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import swing.ChessLobby;
-import swing.aiControl;
+import swing.aiNormal;
 
 public class ChessBoard extends JFrame {
 
@@ -47,7 +47,8 @@ public class ChessBoard extends JFrame {
 	public boolean aiColor;
 	public boolean easy;// true = easy, false = normal.
 
-	public aiControl ai;
+	public aiNormal ai;// normal mode
+	public aiEasy aiE;// easy mode
 
 	public ChessPiece[][] d() {
 		return boardState;
@@ -93,20 +94,36 @@ public class ChessBoard extends JFrame {
 		add(statusPanel, BorderLayout.SOUTH);
 
 		moveGenerator = new MoveGenerator(boardState);
-		ai = new aiControl();
-		ai.myColor = aiColor;
-		if (turn == aiColor) {
-			ai.controller(this, moveGenerator, boardState);
+		if (easy == true) {
+			aiE = new aiEasy();
+			aiE.myColor = aiColor;
+			if (turn == aiColor) {
+				aiE.controller(this, moveGenerator, boardState);
+			}
+		} else if (easy == false) {
+			ai = new aiNormal();
+			ai.myColor = aiColor;
+			if (turn == aiColor) {
+				ai.controller(this, moveGenerator, boardState);
+			}
 		}
 
 	}
 
 	public void gameManager() {
 		// turn true면 플레이어 턴
-		if (turn == true) {
+		if (easy == true) {
+			if (turn == true) {
 
-		} else if (turn == false) {
-			ai.controller(this, moveGenerator, boardState);
+			} else if (turn == false) {
+				aiE.controller(this, moveGenerator, boardState);
+			}
+		} else if (easy == false) {
+			if (turn == true) {
+
+			} else if (turn == false) {
+				ai.controller(this, moveGenerator, boardState);
+			}
 		}
 	}
 
