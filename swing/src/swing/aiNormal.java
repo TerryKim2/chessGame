@@ -57,7 +57,7 @@ public class aiNormal {
 		System.out.println("pieces: " + pieces.size());
 		System.out.println("Total Moves: " + totalMove.size());
 		System.out.println(count);
-
+		btScore = 0;
 		return totalMove;
 	}
 
@@ -117,7 +117,7 @@ public class aiNormal {
 		}
 		st = pieces.get(randomValue);
 		for(int i = 0;i< pieces.size();i++) {
-			System.out.println(pieces.get(i).getType());
+			System.out.println("pieces: "+pieces.get(i).getType());
 		}
 		if (bestMove1.isEmpty() != true) {
 			board.aiMovePiece(st, bestMove1.get(randomValue).x, bestMove1.get(randomValue).y);
