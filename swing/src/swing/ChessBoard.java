@@ -45,6 +45,7 @@ public class ChessBoard extends JFrame {
 
 	public boolean playerColor;// true = white, false = black
 	public boolean aiColor;
+	public boolean easy;// true = easy, false = normal.
 
 	public aiControl ai;
 
@@ -52,9 +53,11 @@ public class ChessBoard extends JFrame {
 		return boardState;
 	}
 
-	public ChessBoard(boolean info) {
+	public ChessBoard(boolean info, boolean difficulty) {
 		this.playerColor = info;
 		this.aiColor = !info;
+		this.easy = difficulty;
+		System.out.println(easy);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(500, 500);
 		setLayout(new BorderLayout());
@@ -98,12 +101,10 @@ public class ChessBoard extends JFrame {
 
 	}
 
-
-	
 	public void gameManager() {
-		//turn true면 플레이어 턴
-		if(turn == true) {
-			
+		// turn true면 플레이어 턴
+		if (turn == true) {
+
 		} else if (turn == false) {
 			ai.controller(this, moveGenerator, boardState);
 		}
@@ -164,7 +165,7 @@ public class ChessBoard extends JFrame {
 					// Move piece and reset highlights
 					resetSquareHighlights();
 					movePiece(row, col);
-					
+
 				}
 			}
 		}
@@ -178,8 +179,9 @@ public class ChessBoard extends JFrame {
 			break;
 		case ROOK:
 			validMoves = moveGenerator.getValidRookMoves(selectedRow, selectedCol);
-			if(validMoves.isEmpty()) {
-			System.out.println("empty");}
+			if (validMoves.isEmpty()) {
+				System.out.println("empty");
+			}
 			break;
 		case BISHOP:
 			validMoves = moveGenerator.getValidBishopMoves(selectedRow, selectedCol);
@@ -271,16 +273,17 @@ public class ChessBoard extends JFrame {
 			}
 		}
 	}
-	
-	//aiMove(piece)
-	/*In order to distinguish the movement of the player and ai, 
-	 * it was modified to be used in ai control after copying it with the movepiece method.
+
+	// aiMove(piece)
+	/*
+	 * In order to distinguish the movement of the player and ai, it was modified to
+	 * be used in ai control after copying it with the movepiece method.
 	 */
 	public void aiMovePiece(ChessPiece k, int newRow, int newCol) {
 		selectedPiece = k;
 
 		if (selectedPiece != null) {
-			
+
 			if (isValidMove(k.points.x, k.points.y, newRow, newCol, selectedPiece)
 					&& selectedPiece.isWhite == aiColor) {
 
@@ -295,16 +298,15 @@ public class ChessBoard extends JFrame {
 					boardState[capturedPawnRow][capturedPawnCol] = null;
 					squares[capturedPawnRow][capturedPawnCol].setIcon(null);
 				}
-				
 
 				// Move the pawn
 				boardState[newRow][newCol] = selectedPiece;
 				boardState[k.points.x][k.points.y] = null;
 				squares[newRow][newCol].setIcon(selectedPiece.getIcon());
 				squares[k.points.x][k.points.y].setIcon(null);
-				
+
 				if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && (newRow == 0 || newRow == SIZE - 1)) {
-					ChessPiece.PieceType newType = promptForPawnPromotion();
+					ChessPiece.PieceType newType = promptForAIPawnPromotion();
 					String imagePath = getImagePathForPieceType(newType, selectedPiece.isWhite());
 					selectedPiece = new ChessPiece(imagePath, selectedPiece.isWhite(), newType);
 					boardState[newRow][newCol] = selectedPiece;
@@ -352,6 +354,21 @@ public class ChessBoard extends JFrame {
 		case "Knight":
 			return ChessPiece.PieceType.KNIGHT;
 		default:
+			return ChessPiece.PieceType.QUEEN;
+		}
+	}
+
+	private ChessPiece.PieceType promptForAIPawnPromotion() {
+		Object[] possiblePieces = { "Queen", "Rook", "Bishop", "Knight" };
+		int temp = (int) (Math.random() * possiblePieces.length);
+		Object tp = possiblePieces[temp];
+		if (tp == "Rook") {
+			return ChessPiece.PieceType.ROOK;
+		} else if (tp == "Bishop") {
+			return ChessPiece.PieceType.BISHOP;
+		} else if (tp == "Knight") {
+			return ChessPiece.PieceType.KNIGHT;
+		} else {
 			return ChessPiece.PieceType.QUEEN;
 		}
 	}
@@ -529,7 +546,8 @@ public class ChessBoard extends JFrame {
 		public boolean doubleMoved() {
 			return madeDoubleMove;
 		}
-		//I also needed quite a bit of information about the point, so I made it.
+
+		// I also needed quite a bit of information about the point, so I made it.
 		public Point getPoints() {
 			return points;
 		}

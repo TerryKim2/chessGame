@@ -24,7 +24,7 @@ public class ChessLobby extends JFrame {
         setTitle("Chess Lobby");
         setSize(1920, 1080);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ImageIcon img = new ImageIcon(System.getProperty("user.dir")+"\\resources\\button_image.png");
+        ImageIcon img = new ImageIcon(System.getProperty("user.dir") + "\\resources\\button_image.png");
         JLabel textLabel1 = new JLabel("PLAY");
         textLabel1.setFont(new Font("times", Font.BOLD, 50));
         textLabel1.setHorizontalAlignment(JLabel.CENTER);
