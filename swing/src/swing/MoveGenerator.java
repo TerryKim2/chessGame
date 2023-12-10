@@ -285,6 +285,8 @@ public class MoveGenerator {
 	    }
 	}
 
+	//TODO delete placeholder method when Joshua replies
+	//public List<Point> getMovesThatResolveCheck(int row, int col, ChessPiece selectedPiece){return null;};
 	
 
 	
