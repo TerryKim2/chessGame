@@ -197,12 +197,8 @@ public class ChessLobby extends JFrame {
         historyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                HistoryGUI historyGUI = null;
-                try {
-                    historyGUI = new HistoryGUI();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                dispose();
+                HistoryGUI historyGUI = new HistoryGUI();
                 historyGUI.setVisible(true);
             }
         });
