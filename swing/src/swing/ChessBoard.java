@@ -112,6 +112,7 @@ public class ChessBoard extends JFrame {
 
 	public void gameManager() {
 		// turn true면 플레이어 턴
+		
 		if (easy == true) {
 			if (turn == true) {
 
@@ -158,6 +159,8 @@ public class ChessBoard extends JFrame {
 			squares[row][col].setIcon(boardState[row][col].getIcon());
 		}
 	}
+	
+	
 
 	private class ButtonListener implements ActionListener {
 		private int row, col;
@@ -166,7 +169,7 @@ public class ChessBoard extends JFrame {
 			this.row = row;
 			this.col = col;
 		}
-
+		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (turn == true) {
@@ -176,7 +179,7 @@ public class ChessBoard extends JFrame {
 						selectedPiece = boardState[row][col];
 						selectedRow = row;
 						selectedCol = col;
-						highlightValidMoves();
+						highlightValidMoves(row, col);
 					}
 				} else if (selectedPiece != null) {
 					// Move piece and reset highlights
@@ -187,42 +190,94 @@ public class ChessBoard extends JFrame {
 			}
 		}
 	}
+	
+	private boolean isCheckmate(boolean isWhitePlayer) {
+		System.out.print("Is ");
+		System.out.print(isWhitePlayer ? "White" : "Black");
+		System.out.println(" in check? : " + moveGenerator.isKingInCheck(isWhitePlayer));
+		System.out.println();
+	    if (!moveGenerator.isKingInCheck(isWhitePlayer)) {
+	        return false; // Not in checkmate if the king is not in check
+	    }
 
-	private void highlightValidMoves() {
-		List<Point> validMoves;
-		switch (selectedPiece.getType()) {
-		case PAWN:
-			validMoves = moveGenerator.getValidPawnMoves(selectedRow, selectedCol);
-			break;
-		case ROOK:
-			validMoves = moveGenerator.getValidRookMoves(selectedRow, selectedCol);
-			if (validMoves.isEmpty()) {
-				System.out.println("empty");
-			}
-			break;
-		case BISHOP:
-			validMoves = moveGenerator.getValidBishopMoves(selectedRow, selectedCol);
-			break;
-		case QUEEN:
-			validMoves = moveGenerator.getValidQueenMoves(selectedRow, selectedCol);
-			break;
-		case KING:
-			validMoves = moveGenerator.getValidKingMoves(selectedRow, selectedCol);
-			break;
-		case KNIGHT:
-			validMoves = moveGenerator.getValidKnightMoves(selectedRow, selectedCol);
-			break;
-		default:
-			validMoves = new ArrayList<>();
-			break;
-		}
+	    // Check if any move can get the king out of check
+	    for (int row = 0; row < SIZE; row++) {
+	        for (int col = 0; col < SIZE; col++) {
+	            ChessPiece piece = boardState[row][col];
+	            if (piece != null && piece.isWhite() == isWhitePlayer) {
+	                List<Point> validMoves = moveGenerator.getValidMovesForPiece(row, col);
+	                for (Point move : validMoves) {
+	                    if (!moveGenerator.movePutsKingInCheck(row, col, move.x, move.y, isWhitePlayer)) {
+	                        return false; // Found a move that can get the king out of check
+	                    }
+	                }
+	            }
+	        }
+	    }
 
-		for (Point move : validMoves) {
-			squares[move.x][move.y].setBackground(Color.GREEN); // Highlight square
-		}
-		// Add similar conditions for other pieces
+	    return true; // No moves available to escape check, so it's checkmate
 	}
 
+	
+	
+
+//	private void highlightValidMoves() {
+//		List<Point> validMoves;
+//		switch (selectedPiece.getType()) {
+//		case PAWN:
+//			validMoves = moveGenerator.getValidPawnMoves(selectedRow, selectedCol);
+//			break;
+//		case ROOK:
+//			validMoves = moveGenerator.getValidRookMoves(selectedRow, selectedCol);
+//			if (validMoves.isEmpty()) {
+//				System.out.println("empty");
+//			}
+//			break;
+//		case BISHOP:
+//			validMoves = moveGenerator.getValidBishopMoves(selectedRow, selectedCol);
+//			break;
+//		case QUEEN:
+//			validMoves = moveGenerator.getValidQueenMoves(selectedRow, selectedCol);
+//			break;
+//		case KING:
+//			validMoves = moveGenerator.getValidKingMoves(selectedRow, selectedCol);
+//			break;
+//		case KNIGHT:
+//			validMoves = moveGenerator.getValidKnightMoves(selectedRow, selectedCol);
+//			break;
+//		default:
+//			validMoves = new ArrayList<>();
+//			break;
+//		}
+//
+//		for (Point move : validMoves) {
+//			squares[move.x][move.y].setBackground(Color.GREEN); // Highlight square
+//		}
+//		// Add similar conditions for other pieces
+//	}
+
+	public void highlightValidMoves(int row, int col) {
+	    ChessPiece selectedPiece = boardState[row][col];
+	    if (selectedPiece == null) return;
+
+	    boolean kingInCheck = moveGenerator.isKingInCheck(selectedPiece.isWhite());
+	    List<Point> validMoves;
+
+	    if (kingInCheck) {
+	        // If the king is in check, filter the moves to those that would resolve the check
+	        validMoves = moveGenerator.getMovesThatResolveCheck(row, col, selectedPiece);
+	    } else {
+	        // If the king is not in check, get all valid moves for the piece
+	        validMoves = moveGenerator.getValidMovesForPiece(row, col);
+	    }
+
+	    // Highlight the valid moves
+	    for (Point move : validMoves) {
+	    	squares[move.x][move.y].setBackground(Color.GREEN); // Highlight square
+	    }
+	}
+
+	
 	private void resetSquareHighlights() {
 		for (int row = 0; row < SIZE; row++) {
 			for (int col = 0; col < SIZE; col++) {
@@ -233,8 +288,14 @@ public class ChessBoard extends JFrame {
 	}
 
 	private void movePiece(int newRow, int newCol) {
+		
+		if (isCheckmate(isWhiteTurn)) {// Check if the opponent is in checkmate
+	        endGame(!isWhiteTurn);
+	    }
+
+		
 		if (selectedPiece != null) {
-			if (isValidMove(selectedRow, selectedCol, newRow, newCol, selectedPiece)
+			if (isValidMove(selectedRow, selectedCol, newRow, newCol)
 					&& selectedPiece.isWhite == playerColor) {
 
 				if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && Math.abs(newRow - selectedRow) == 2) {
@@ -290,6 +351,30 @@ public class ChessBoard extends JFrame {
 			}
 		}
 	}
+	
+	private void endGame(boolean isWhiteWinner) {
+		String winner = isWhiteWinner ? "White" : "Black";
+        int option = JOptionPane.showOptionDialog(
+            null, 
+            "Checkmate! " + winner + " wins!\nWould you like to play again?", 
+            "Game Over", 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.INFORMATION_MESSAGE, 
+            null, 
+            new String[]{"Reset Board", "Close Game"}, 
+            "Reset Board"
+        );
+
+        if (option == JOptionPane.YES_OPTION) {
+            //resetBoard();
+        	dispose();
+        	ChessLobby lobby = new ChessLobby();
+            lobby.setVisible(true);
+        } else {
+        	
+            System.exit(0); // Close the application
+        }
+	}
 
 	// aiMove(piece)
 	/*
@@ -297,11 +382,16 @@ public class ChessBoard extends JFrame {
 	 * be used in ai control after copying it with the movepiece method.
 	 */
 	public void aiMovePiece(ChessPiece k, int newRow, int newCol) {
+		
+		if (isCheckmate(isWhiteTurn)) {// Check if the opponent is in checkmate
+	        endGame(!isWhiteTurn);
+	    }
+		
 		selectedPiece = k;
 
 		if (selectedPiece != null) {
 
-			if (isValidMove(k.points.x, k.points.y, newRow, newCol, selectedPiece)
+			if (isValidMove(k.points.x, k.points.y, newRow, newCol)
 					&& selectedPiece.isWhite == aiColor) {
 
 				if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && Math.abs(newRow - k.points.y) == 2) {
@@ -425,82 +515,110 @@ public class ChessBoard extends JFrame {
 		}
 	}
 
-	public boolean isValidMove(int startX, int startY, int endX, int endY, ChessPiece piece) {
+//	public boolean isValidMove(int startX, int startY, int endX, int endY, ChessPiece piece) {
+//
+//		Point temp = new Point(endX, endY);
+//		System.out.println("Input Move: (" + temp.x + "," + temp.y + ")");
+//
+//		if (selectedPiece.type == ChessPiece.PieceType.PAWN) {
+//			System.out.println("Selected a pawn.");
+//			List<Point> pawn = new ArrayList<>(moveGenerator.getValidPawnMoves(startX, startY));
+//			System.out.print("Possible Moves: ");
+//			for (Point p : pawn) {
+//				System.out.print("(" + p.x + "," + p.y + ")");
+//				if (temp.equals(p)) {
+//					System.out.println("\nReturning True.");
+//					return true;
+//				}
+//			}
+//		} else if (selectedPiece.type == ChessPiece.PieceType.ROOK) {
+//			System.out.println("Selected a rook.");
+//			List<Point> rook = new ArrayList<>(moveGenerator.getValidRookMoves(startX, startY));
+//			System.out.print("Possible Moves: ");
+//			for (Point p : rook) {
+//				System.out.print("(" + p.x + "," + p.y + ")");
+//				if (temp.equals(p)) {
+//					System.out.println("\nReturning True.");
+//					return true;
+//				}
+//			}
+//
+//		} else if (selectedPiece.type == ChessPiece.PieceType.BISHOP) {
+//			System.out.println("Selected a bishop.");
+//			List<Point> bishop = new ArrayList<>(moveGenerator.getValidBishopMoves(startX, startY));
+//			System.out.print("Possible Moves: ");
+//			for (Point p : bishop) {
+//				System.out.print("(" + p.x + "," + p.y + ")");
+//				if (temp.equals(p)) {
+//					System.out.println("\nReturning True.");
+//					return true;
+//				}
+//			}
+//		} else if (selectedPiece.type == ChessPiece.PieceType.QUEEN) {
+//			System.out.println("Selected a queen.");
+//			List<Point> queen = new ArrayList<>(moveGenerator.getValidQueenMoves(startX, startY));
+//			System.out.print("Possible Moves: ");
+//			for (Point p : queen) {
+//				System.out.print("(" + p.x + "," + p.y + ")");
+//				if (temp.equals(p)) {
+//					System.out.println("\nReturning True.");
+//					return true;
+//				}
+//			}
+//		} else if (selectedPiece.type == ChessPiece.PieceType.KING) {
+//			System.out.println("Selected a king.");
+//			List<Point> king = new ArrayList<>(moveGenerator.getValidKingMoves(startX, startY));
+//			System.out.print("Possible Moves: ");
+//			for (Point p : king) {
+//				System.out.print("(" + p.x + "," + p.y + ")");
+//				if (temp.equals(p)) {
+//					System.out.println("\nReturning True.");
+//					return true;
+//				}
+//			}
+//		} else if (selectedPiece.type == ChessPiece.PieceType.KNIGHT) {
+//			System.out.println("Selected a knight.");
+//			List<Point> knight = new ArrayList<>(moveGenerator.getValidKnightMoves(startX, startY));
+//			System.out.print("Possible Moves: ");
+//			for (Point p : knight) {
+//				System.out.print("(" + p.x + "," + p.y + ")");
+//				if (temp.equals(p)) {
+//					System.out.println("\nReturning True.");
+//					return true;
+//				}
+//			}
+//		}
+//		System.out.println("\nReturning false.");
+//		return false;
+//	}
+	
+	private boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+	    ChessPiece piece = boardState[startRow][startCol];
+	    if (piece == null) return false;
 
-		Point temp = new Point(endX, endY);
-		System.out.println("Input Move: (" + temp.x + "," + temp.y + ")");
+	    boolean isWhite = piece.isWhite();
+	    boolean kingInCheck = moveGenerator.isKingInCheck(isWhite);
 
-		if (selectedPiece.type == ChessPiece.PieceType.PAWN) {
-			System.out.println("Selected a pawn.");
-			List<Point> pawn = new ArrayList<>(moveGenerator.getValidPawnMoves(startX, startY));
-			System.out.print("Possible Moves: ");
-			for (Point p : pawn) {
-				System.out.print("(" + p.x + "," + p.y + ")");
-				if (temp.equals(p)) {
-					System.out.println("\nReturning True.");
-					return true;
-				}
-			}
-		} else if (selectedPiece.type == ChessPiece.PieceType.ROOK) {
-			System.out.println("Selected a rook.");
-			List<Point> rook = new ArrayList<>(moveGenerator.getValidRookMoves(startX, startY));
-			System.out.print("Possible Moves: ");
-			for (Point p : rook) {
-				System.out.print("(" + p.x + "," + p.y + ")");
-				if (temp.equals(p)) {
-					System.out.println("\nReturning True.");
-					return true;
-				}
-			}
+	    List<Point> validMoves = moveGenerator.getValidMovesForPiece(startRow, startCol);
+	    if (!validMoves.contains(new Point(endRow, endCol))) return false;
 
-		} else if (selectedPiece.type == ChessPiece.PieceType.BISHOP) {
-			System.out.println("Selected a bishop.");
-			List<Point> bishop = new ArrayList<>(moveGenerator.getValidBishopMoves(startX, startY));
-			System.out.print("Possible Moves: ");
-			for (Point p : bishop) {
-				System.out.print("(" + p.x + "," + p.y + ")");
-				if (temp.equals(p)) {
-					System.out.println("\nReturning True.");
-					return true;
-				}
-			}
-		} else if (selectedPiece.type == ChessPiece.PieceType.QUEEN) {
-			System.out.println("Selected a queen.");
-			List<Point> queen = new ArrayList<>(moveGenerator.getValidQueenMoves(startX, startY));
-			System.out.print("Possible Moves: ");
-			for (Point p : queen) {
-				System.out.print("(" + p.x + "," + p.y + ")");
-				if (temp.equals(p)) {
-					System.out.println("\nReturning True.");
-					return true;
-				}
-			}
-		} else if (selectedPiece.type == ChessPiece.PieceType.KING) {
-			System.out.println("Selected a king.");
-			List<Point> king = new ArrayList<>(moveGenerator.getValidKingMoves(startX, startY));
-			System.out.print("Possible Moves: ");
-			for (Point p : king) {
-				System.out.print("(" + p.x + "," + p.y + ")");
-				if (temp.equals(p)) {
-					System.out.println("\nReturning True.");
-					return true;
-				}
-			}
-		} else if (selectedPiece.type == ChessPiece.PieceType.KNIGHT) {
-			System.out.println("Selected a knight.");
-			List<Point> knight = new ArrayList<>(moveGenerator.getValidKnightMoves(startX, startY));
-			System.out.print("Possible Moves: ");
-			for (Point p : knight) {
-				System.out.print("(" + p.x + "," + p.y + ")");
-				if (temp.equals(p)) {
-					System.out.println("\nReturning True.");
-					return true;
-				}
-			}
-		}
-		System.out.println("\nReturning false.");
-		return false;
+	    // Simulate the move
+	    ChessPiece tempPiece = boardState[endRow][endCol];
+	    boardState[endRow][endCol] = piece;
+	    boardState[startRow][startCol] = null;
+
+	    boolean stillInCheck = moveGenerator.isKingInCheck(isWhite);
+
+	    // Undo the move
+	    boardState[startRow][startCol] = piece;
+	    boardState[endRow][endCol] = tempPiece;
+
+	    // If the king is in check, the move is only valid if it resolves the check
+	    if (kingInCheck && stillInCheck) return false;
+
+	    return true;
 	}
+
 
 	private void indicateWrongMove(int row, int col) {
 		final int flashCount = 2; // Total number of flashes
