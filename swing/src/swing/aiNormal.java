@@ -54,9 +54,7 @@ public class aiNormal {
 				}
 			}
 		}
-		System.out.println("pieces: " + pieces.size());
-		System.out.println("Total Moves: " + totalMove.size());
-		System.out.println(count);
+		
 		btScore = 0;
 		return totalMove;
 	}
@@ -105,10 +103,9 @@ public class aiNormal {
 		generator = mv;
 		state = bd;
 		// ChessPiece selectPiece;
-		System.out.println("AIControl시작");
+		
 		bestMove1 = select(board);
 		randomValue = (int) (Math.random() * bestMove1.size());
-		System.out.println("size" + bestMove1.size());
 		//if(bestMove1.size() != 0) {
 		if(bestMove1.size() == 1) {
 			randomValue = 0;
@@ -116,9 +113,7 @@ public class aiNormal {
 			randomValue = (int) (Math.random() * bestMove1.size());
 		}
 		st = pieces.get(randomValue);
-		for(int i = 0;i< pieces.size();i++) {
-			System.out.println("pieces: "+pieces.get(i).getType());
-		}
+		
 		if (bestMove1.isEmpty() != true) {
 			board.aiMovePiece(st, bestMove1.get(randomValue).x, bestMove1.get(randomValue).y);
 		} else {

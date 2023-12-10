@@ -41,7 +41,6 @@ public class aiEasy {
 				}
 			}
 		}
-		
 		return bestMove;
 	}
 	// Determine the type of chess piece based on the current point and move to a
@@ -75,7 +74,6 @@ public class aiEasy {
 			bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
 			break;
 		}
-
 		return bestMoves;
 	}
 
@@ -90,7 +88,7 @@ public class aiEasy {
 		// ChessPiece selectPiece;
 		bestMove1 = select(board);
 		a = (int) (Math.random()*bestMove1.size());
-		System.out.println("size"+bestMove1.size());
+		
 		if (bestMove1.isEmpty() != true) {
 			board.aiMovePiece(st, bestMove1.get(a).x, bestMove1.get(a).y);
 		} else {
