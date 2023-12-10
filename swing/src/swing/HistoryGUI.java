@@ -3,23 +3,78 @@ package swing;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryGUI extends JFrame {
+    private JButton backButton;
+    private Image backgroundImage;
     private JPanel contentPane;
+    private JLabel history;
     private JScrollPane scrollPane;
     private JTable table;
 
     public HistoryGUI() throws SQLException {
         setTitle("Game History");
-        setSize(1920, 1080);
+        setSize(1440, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        //ImageIcon img = new ImageIcon(System.getProperty("user.dir") + "\\resources\\button_image.png");
+        ImageIcon img = new ImageIcon("swing/resources/button_image.png");
+        JLabel textLabel1 = new JLabel("BACK");
+        textLabel1.setFont(new Font("times", Font.BOLD, 30));
+        textLabel1.setHorizontalAlignment(JLabel.CENTER);
+        textLabel1.setForeground(Color.white);
+
+        //backgroundImage = new ImageIcon(System.getProperty("user.dir")+"\\resources\\background.jpg").getImage();
+        backgroundImage = new ImageIcon("swing/resources/background.jpg").getImage();
+
+        history = new JLabel("Game History");
+        history.setFont(new Font("times", Font.BOLD, 65));
+        history.setForeground(Color.WHITE);
+        history.setBounds(410, 70, 500, 150);
+        history.setHorizontalAlignment(JLabel.CENTER);
+
+        backButton = new JButton();
+        backButton.setBounds(450, 600, 350, 100);
+        backButton.setIcon(img);
+        backButton.setFont(new Font("times", Font.BOLD, 40));
+        backButton.setForeground(Color.WHITE);
+        backButton.setBorderPainted(true);
+        backButton.setContentAreaFilled(false);
+        backButton.setFocusPainted(false);
+        backButton.setLayout(new BorderLayout());
+        backButton.add(textLabel1, BorderLayout.CENTER);
+
+        contentPane = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics k) {
+                super.paintComponent(k);
+                k.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+        contentPane.setLayout(null);
+        contentPane.add(history);
+        contentPane.add(backButton);
+
+
+        //contentPane.setBorder(new EmptyBorder(50, 50, 50, 50));
         setContentPane(contentPane);
+
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                ChessLobby lobby = new ChessLobby();
+                lobby.setVisible(true);
+            }
+        });
+
+
 
         //get data from the games table
         ResultSet rs = DBManager.executeSQLquery("SELECT * FROM games");
@@ -60,6 +115,7 @@ public class HistoryGUI extends JFrame {
         contentPane.add(scrollPane, gbc_scrollPane);
         table= new JTable(rows.toArray(new Object[rows.size()][7]), columns);
         scrollPane.setViewportView(table);
+
     }
 
 }
