@@ -110,11 +110,13 @@ public class aiNormal {
 		randomValue = (int) (Math.random() * bestMove1.size());
 		System.out.println("size" + bestMove1.size());
 		//if(bestMove1.size() != 0) {
-		if(bestMove1.size() == 1) {
+		if(pieces.size() == 1) {
 			randomValue = 0;
-		} else if(bestMove1.size() != 1) {
+		} else if(pieces.size() != 1) {
 			randomValue = (int) (Math.random() * bestMove1.size());
 		}
+		System.out.println("SIZE OF PIECES LIST: " + pieces.size());
+		System.out.println("RANDOM VALUE: " + randomValue);
 		st = pieces.get(randomValue);
 		for(int i = 0;i< pieces.size();i++) {
 			System.out.println("pieces: "+pieces.get(i).getType());
