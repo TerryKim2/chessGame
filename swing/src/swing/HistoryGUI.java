@@ -11,7 +11,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-
+/**
+ * Sets up a user interface for the history screen
+ * @author sofiiarudenka
+ */
 public class HistoryGUI extends JFrame {
     private JButton backButton;
     private Image backgroundImage;
@@ -20,6 +23,11 @@ public class HistoryGUI extends JFrame {
     private JScrollPane scrollPane;
     private JTable table;
 
+    /**
+     * sets up a history screen with the table of game results
+     * including date, time, difficulty and game result
+     * and provides a back button to go back to Chess lobby screen
+     */
     public HistoryGUI() {
         setTitle("Game History");
         setSize(1440, 900);

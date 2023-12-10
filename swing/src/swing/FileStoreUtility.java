@@ -7,8 +7,18 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Provides methods to store the game result to the general filestore
+ * Class requires 2 things: difficulty and game result
+ * @author sofiiarudenka
+ */
 public class FileStoreUtility {
 
+    /**
+     * stores the result of the game to a file GameHistory.txt
+     * @param difficulty
+     * @param result
+     */
     public static void writeGameResultToFileStore(String difficulty, String result) {
         try {
             FileWriter writer = new FileWriter("GameHistory.txt", true);

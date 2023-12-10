@@ -130,7 +130,8 @@ public class ChessBoard extends JFrame {
 	}
 
 	private void initializePieces(int row, int col) {
-		String basePath = System.getProperty("user.dir") + "\\src\\pieces\\"; // Replace with the actual path
+		//String basePath = System.getProperty("user.dir") + "\\src\\pieces\\"; // Replace with the actual path
+		String basePath ="swing/src/pieces/";
 		boolean isWhite = !(row < 2); // White pieces are in the first two rows
 		String colorPrefix = isWhite ? "w" : "b"; // 'w' for white, 'b' for black
 
@@ -345,6 +346,9 @@ public class ChessBoard extends JFrame {
 	
 	private void endGame(boolean isWhiteWinner) {
 		String winner = isWhiteWinner ? "White" : "Black";
+		String difficulty = easy? "easy" : "normal";
+		String result = isWhiteWinner ? (playerColor? "win" : "loss") : (playerColor? "loss" : "win");
+		FileStoreUtility.writeGameResultToFileStore(difficulty, result);
         int option = JOptionPane.showOptionDialog(
             null, 
             "Checkmate! " + winner + " wins!\nWould you like to play again?", 
