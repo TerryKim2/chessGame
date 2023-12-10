@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import swing.ChessBoard.ChessPiece;
 
@@ -36,27 +37,66 @@ public class MoveGenerator {
 
 	    return validMoves;
 	}
+
 	
 	public List<Point> getValidKingMoves(int row, int col) {
-		List<Point> validMoves = new ArrayList<>();
+		boolean isWhite = boardState[row][col].isWhite();
+        List<Point> validMoves = new ArrayList<>();
+        int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
+        int[] colOffsets = {-1, 0, 1, -1, 1, -1, 0, 1};
 
-		// The king can move one square in any direction
-		int[] rowOffsets = { -1, -1, -1, 0, 0, 1, 1, 1 };
-		int[] colOffsets = { -1, 0, 1, -1, 1, -1, 0, 1 };
+        for (int i = 0; i < rowOffsets.length; i++) {
+            int newRow = row + rowOffsets[i];
+            int newCol = col + colOffsets[i];
 
-		for (int i = 0; i < rowOffsets.length; i++) {
-			int newRow = row + rowOffsets[i];
-			int newCol = col + colOffsets[i];
+            if (isWithinBoard(newRow, newCol) &&
+                (isSquareEmpty(newRow, newCol) || isOpponentPiece(newRow, newCol, isWhite)) &&
+                !isSquareUnderAttack(newRow, newCol, isWhite)) {
+                validMoves.add(new Point(newRow, newCol));
+            }
+        }
 
-			if (isWithinBoard(newRow, newCol) && (isSquareEmpty(newRow, newCol)
-					|| isOpponentPiece(newRow, newCol, boardState[row][col].isWhite()))) {
-				// Additional checks for check conditions can be added here
-				validMoves.add(new Point(newRow, newCol));
-			}
-		}
+        return validMoves.stream()
+                .filter(move -> !isSquareUnderAttack(move.x, move.y, boardState[row][col].isWhite()))
+                .collect(Collectors.toList());
+    }
+	
+	
+	private boolean isSquareUnderAttack(int row, int col, boolean isWhiteKing) {
+	    // Check for threats from knights, rooks, bishops, queens, and king
+	    for (int r = 0; r < SIZE; r++) {
+	        for (int c = 0; c < SIZE; c++) {
+	            ChessPiece piece = boardState[r][c];
+	            if (piece != null && piece.isWhite() != isWhiteKing && piece.getType() != ChessPiece.PieceType.KING) {
+	                // Exclude pawns from this check; handle them separately
+	                if (piece.getType() != ChessPiece.PieceType.PAWN) {
+	                    List<Point> opponentMoves = getValidMovesForPiece(r, c);
+	                    if (opponentMoves.contains(new Point(row, col))) {
+	                        return true; // Square is under attack by non-pawn piece
+	                    }
+	                }
+	            }
+	        }
+	    }
 
-		return validMoves;
+	    // Check specifically for pawn threats
+	    int pawnRowOffset = isWhiteKing ? -1 : 1; // Pawns attack in the opposite direction of their movement
+	    int[] pawnColOffsets = {-1, 1};
+	    for (int colOffset : pawnColOffsets) {
+	        int pawnRow = row + pawnRowOffset;
+	        int pawnCol = col + colOffset;
+	        if (isWithinBoard(pawnRow, pawnCol)) {
+	            ChessPiece pawn = boardState[pawnRow][pawnCol];
+	            if (pawn != null && pawn.getType() == ChessPiece.PieceType.PAWN && pawn.isWhite() != isWhiteKing) {
+	                return true; // The square is attacked by an opponent's pawn
+	            }
+	        }
+	    }
+
+	    return false; // Square is not under attack
 	}
+
+
 
 	public List<Point> getValidBishopMoves(int row, int col) {
 		List<Point> validMoves = new ArrayList<>();
@@ -269,6 +309,30 @@ public class MoveGenerator {
 
 	    return false; // The king is not in check
 	}
+	
+	public List<Point> getMovesThatResolveCheck(int row, int col, ChessPiece piece) {
+	    List<Point> movesThatResolveCheck = new ArrayList<>();
+	    List<Point> validMoves = getValidMovesForPiece(row, col);
+
+	    for (Point move : validMoves) {
+	        // Simulate the move
+	        ChessPiece tempPiece = boardState[move.x][move.y];
+	        boardState[move.x][move.y] = piece;
+	        boardState[row][col] = null;
+
+	        if (!isKingInCheck(piece.isWhite())) {
+	            movesThatResolveCheck.add(move);
+	        }
+
+	        // Undo the move
+	        boardState[row][col] = piece;
+	        boardState[move.x][move.y] = tempPiece;
+	    }
+
+	    return movesThatResolveCheck;
+	}
+
+
 
 	public List<Point> getValidMovesForPiece(int row, int col) {
 	    ChessPiece piece = boardState[row][col];
@@ -285,9 +349,26 @@ public class MoveGenerator {
 	    }
 	}
 
-	//TODO delete placeholder method when Joshua replies
-	//public List<Point> getMovesThatResolveCheck(int row, int col, ChessPiece selectedPiece){return null;};
 	
+	public Point[] findKingPositions() {
+        Point whiteKingPosition = null;
+        Point blackKingPosition = null;
 
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                ChessPiece piece = boardState[row][col];
+                if (piece != null && piece.getType() == ChessPiece.PieceType.KING) {
+                    if (piece.isWhite()) {
+                        whiteKingPosition = new Point(row, col);
+                    } else {
+                        blackKingPosition = new Point(row, col);
+                    }
+                }
+            }
+        }
+
+        return new Point[]{whiteKingPosition, blackKingPosition};
+    }
+	
 	
 }
