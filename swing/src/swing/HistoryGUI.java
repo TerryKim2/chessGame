@@ -32,15 +32,15 @@ public class HistoryGUI extends JFrame {
         setTitle("Game History");
         setSize(1440, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //ImageIcon img = new ImageIcon(System.getProperty("user.dir") + "\\resources\\button_image.png");
-        ImageIcon img = new ImageIcon("swing/resources/button_image.png");
+        ImageIcon img = new ImageIcon(getClass().getClassLoader().getResource("resources\\button_image.png"));
+        //ImageIcon img = new ImageIcon("swing/resources/button_image.png");
         JLabel textLabel1 = new JLabel("BACK");
         textLabel1.setFont(new Font("times", Font.BOLD, 30));
         textLabel1.setHorizontalAlignment(JLabel.CENTER);
         textLabel1.setForeground(Color.white);
 
-        //backgroundImage = new ImageIcon(System.getProperty("user.dir")+"\\resources\\background.jpg").getImage();
-        backgroundImage = new ImageIcon("swing/resources/background.jpg").getImage();
+        backgroundImage = new ImageIcon(getClass().getClassLoader().getResource("\\resources\\background.jpg")).getImage();
+        //backgroundImage = new ImageIcon("swing/resources/background.jpg").getImage();
 
         history = new JLabel("Game History");
         history.setFont(new Font("times", Font.BOLD, 65));
