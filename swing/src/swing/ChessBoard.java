@@ -283,6 +283,7 @@ public class ChessBoard extends JFrame {
 		
 		if (isCheckmate(isWhiteTurn)) {// Check if the opponent is in checkmate
 	        endGame(!isWhiteTurn);
+	        selectedPiece = null;
 	    }
 
 		

@@ -31,58 +31,51 @@ public class aiNormal {
 		List<Point> bestMove = new ArrayList<>();
 		List<Point> totalMove = new ArrayList<>();
 		pieces = new ArrayList<>();
-		int count = 0;
 
-		if (myColor == true && generator.isKingInCheck(true) || myColor == false && generator.isKingInCheck(false)) {
+		if ((myColor == true && generator.isKingInCheck(true))
+				|| (myColor == false && generator.isKingInCheck(false))) {
 			check = true;
 		} else {
 			check = false;
 		}
+		/*
+		 * for (int a = 0; a < 8; a++) { for (int b = 0; b < 8; b++) { if
+		 * (board.d()[a][b] != null && board.d()[a][b].isWhite() == myColor) { bestMove
+		 * = generator.getMovesThatResolveCheck(a, b, board.d()[a][b]); if
+		 * (bestMove.size() > 0) { totalMove.addAll(bestMove); st = board.d()[a][b];
+		 * st.points = new Point(a, b); pieces.add(st); } } } }
+		 */
 
 		for (int i = 0; i < 8; i++) {
 			for (int m = 0; m < 8; m++) {
 				if (board.d()[i][m] != null && board.d()[i][m].isWhite() == myColor) {
-					count++;
 					bestMove = calculate(i, m, board.d()[i][m]);
-					dma(i, m, board);
 					// 해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
 					if (cmove == true || immovable == true) {
 						continue;
-					} else if (cmove != true) {
-						st = board.d()[i][m];
-						st.points = new Point(i, m);
-						if (btScore < nScore) {
-							btScore = nScore;
-							totalMove.clear();
-							totalMove.addAll(bestMove);
-							pieces.clear();
-							pieces.add(st);
-						} else if (btScore == nScore) {
-							totalMove.addAll(bestMove);
-							pieces.add(st);
+					} else if (cmove != true && immovable == false) {
+						if (bestMove.size() > 0) {
+							st = board.d()[i][m];
+							st.points = new Point(i, m);
+							if (btScore < nScore) {
+								btScore = nScore;
+								totalMove.clear();
+								totalMove.addAll(bestMove);
+								pieces.clear();
+								pieces.add(st);
+							} else if (btScore == nScore) {
+								totalMove.addAll(bestMove);
+								pieces.add(st);
+							}
 						}
 					}
 				}
 			}
 		}
+
 		immovable = false;
 		btScore = 0;
 		return totalMove;
-	}
-
-	// 해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
-	public boolean dma(int a, int b, ChessBoard board) {
-
-		ChessPiece tem = board.d()[a][b];
-		board.d()[a][b] = null;
-
-		if (myColor == true && generator.isKingInCheck(true) || myColor == false && generator.isKingInCheck(false)) {
-			immovable = true;
-		} else {
-			immovable = false;
-		}
-		board.d()[a][b] = tem;
-		return immovable;
 	}
 
 	// Determine the type of chess piece based on the current point and move to a
@@ -92,10 +85,11 @@ public class aiNormal {
 		int betterScore = 0;
 
 		List<Point> bestMoves = new ArrayList<>();
+
 		if (check == true) {
-			bestMoves = find(startX, startY, betterScore, bestMoves,
-					generator.getMovesThatResolveCheck(startX, startY, chess));
-		} else {
+			find(startX, startY, betterScore, bestMoves, generator.getMovesThatResolveCheck(startX, startY, chess));
+		} else if (check == false) {
+
 			switch (chess.getType()) {
 			case PAWN:
 				find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
@@ -120,6 +114,7 @@ public class aiNormal {
 				break;
 			}
 		}
+
 		return bestMoves;
 	}
 
@@ -138,18 +133,24 @@ public class aiNormal {
 		// if(bestMove1.size() != 0) {
 		if (pieces.size() == 1) {
 			randomValue = 0;
-		} else if (pieces.size() != 1) {
+		} else if (pieces.size() > 1) {
 			randomValue = (int) (Math.random() * bestMove1.size());
 		}
 		System.out.println("SIZE OF PIECES LIST: " + pieces.size());
 		System.out.println("RANDOM VALUE: " + randomValue);
-		st = pieces.get(randomValue);
-
+		if (pieces.size() > 0) {
+			st = pieces.get(randomValue);
+		} else {
+			st = null;
+		}
+		//System.out.println("랜덤값: "+randomValue);
+		//System.out.println("piece사이즈: "+pieces.size());
 		if (bestMove1.isEmpty() != true) {
 			board.aiMovePiece(st, bestMove1.get(randomValue).x, bestMove1.get(randomValue).y);
 		} else {
-			board.aiMovePiece(st, bestMove1.get(randomValue).x, bestMove1.get(randomValue).y);
+			board.aiMovePiece(st, 0, 0);
 		}
+
 		// }
 
 	}
