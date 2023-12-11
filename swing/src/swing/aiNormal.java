@@ -32,20 +32,20 @@ public class aiNormal {
 		List<Point> totalMove = new ArrayList<>();
 		pieces = new ArrayList<>();
 		int count = 0;
-		
+
 		if (myColor == true && generator.isKingInCheck(true) || myColor == false && generator.isKingInCheck(false)) {
 			check = true;
 		} else {
 			check = false;
 		}
-		
+
 		for (int i = 0; i < 8; i++) {
 			for (int m = 0; m < 8; m++) {
 				if (board.d()[i][m] != null && board.d()[i][m].isWhite() == myColor) {
 					count++;
 					bestMove = calculate(i, m, board.d()[i][m]);
 					dma(i, m, board);
-					//해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
+					// 해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
 					if (cmove == true || immovable == true) {
 						continue;
 					} else if (cmove != true) {
@@ -70,12 +70,12 @@ public class aiNormal {
 		return totalMove;
 	}
 
-	//해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
+	// 해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
 	public boolean dma(int a, int b, ChessBoard board) {
-		
+
 		ChessPiece tem = board.d()[a][b];
 		board.d()[a][b] = null;
-		
+
 		if (myColor == true && generator.isKingInCheck(true) || myColor == false && generator.isKingInCheck(false)) {
 			immovable = true;
 		} else {
@@ -84,7 +84,7 @@ public class aiNormal {
 		board.d()[a][b] = tem;
 		return immovable;
 	}
-	
+
 	// Determine the type of chess piece based on the current point and move to a
 	// higher score within the range where the corresponding chess piece can move.
 	public List<Point> calculate(int startX, int startY, ChessPiece chess) {
