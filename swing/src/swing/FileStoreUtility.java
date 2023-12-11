@@ -1,6 +1,7 @@
 package swing;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -13,15 +14,14 @@ import java.util.Date;
  * @author sofiiarudenka
  */
 public class FileStoreUtility {
-
-    /**
+   /**
      * stores the result of the game to a file GameHistory.txt
      * @param difficulty
      * @param result
      */
-    public static void writeGameResultToFileStore(String difficulty, String result) {
+    public void writeGameResultToFileStore(String difficulty, String result) {
         try {
-            FileWriter writer = new FileWriter("GameHistory.txt", true);
+            FileWriter writer = new FileWriter(getClass().getClassLoader().getResource("GameHistory.txt").getFile(), true);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
             DateFormat dateFormat1 = new SimpleDateFormat("MM/dd/yyyy");
             DateFormat dateFormat2 = new SimpleDateFormat("HH:mm");

@@ -33,14 +33,12 @@ public class HistoryGUI extends JFrame {
         setSize(1440, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ImageIcon img = new ImageIcon(getClass().getClassLoader().getResource("button_image.png"));
-        //ImageIcon img = new ImageIcon("swing/resources/button_image.png");
         JLabel textLabel1 = new JLabel("BACK");
         textLabel1.setFont(new Font("times", Font.BOLD, 30));
         textLabel1.setHorizontalAlignment(JLabel.CENTER);
         textLabel1.setForeground(Color.white);
 
         backgroundImage = new ImageIcon(getClass().getClassLoader().getResource("background.jpg")).getImage();
-        //backgroundImage = new ImageIcon("swing/resources/background.jpg").getImage();
 
         history = new JLabel("Game History");
         history.setFont(new Font("times", Font.BOLD, 65));
@@ -88,7 +86,7 @@ public class HistoryGUI extends JFrame {
         Object columns[] = {"Date", "Time", "Difficulty Level", "Result"};
         List<Object[]> rows = new ArrayList<Object[]>();
         try {
-            FileReader reader = new FileReader("GameHistory.txt");
+            FileReader reader = new FileReader(getClass().getClassLoader().getResource("GameHistory.txt").getFile());
             BufferedReader bufferedReader = new BufferedReader(reader);
 
             String line;

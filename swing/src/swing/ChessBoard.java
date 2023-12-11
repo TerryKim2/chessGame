@@ -673,7 +673,7 @@ public class ChessBoard extends JFrame {
 		String winner = isWhiteWinner ? "White" : "Black";
 		String difficulty = easy ? "easy" : "normal";
 		String result = isWhiteWinner ? (playerColor ? "win" : "loss") : (playerColor ? "loss" : "win");
-		FileStoreUtility.writeGameResultToFileStore(difficulty, result);
+		new FileStoreUtility().writeGameResultToFileStore(difficulty, result);
 		int option = JOptionPane.showOptionDialog(null,
 				"Checkmate! " + winner + " wins!\nWould you like to play again?", "Game Over",
 				JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
