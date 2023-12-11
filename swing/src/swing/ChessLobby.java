@@ -260,23 +260,6 @@ public class ChessLobby extends JFrame {
 
         setContentPane(contentPane1);
     }
-    //game start button
-    private void startGame(JButton difficultyButton) {
-        String selectedDifficulty = difficultyButton.getText();
-        // TODO: Implement game setup with the selected difficulty and transition to the chess game board
-        System.out.println("Starting game with difficulty: " + selectedDifficulty);
-    }
 
-    //run the chess game from the application runner
-    /*public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                ChessLobby lobby = new ChessLobby();
-                lobby.setVisible(true);
-            }
-        });
-    }
-    */
 
 }
