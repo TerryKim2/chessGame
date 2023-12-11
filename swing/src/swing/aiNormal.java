@@ -65,7 +65,7 @@ public class aiNormal {
 				}
 			}
 		}
-
+		immovable = false;
 		btScore = 0;
 		return totalMove;
 	}

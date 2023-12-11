@@ -57,6 +57,7 @@ public class aiEasy {
 				}
 			}
 		}
+		immovable = false;
 		return bestMove;
 	}
 
