@@ -244,7 +244,26 @@ public class ChessBoard extends JFrame {
 	    return true; // No moves available to escape check, so it's checkmate
 	}
 
-	
+	public boolean isStalemate(boolean isWhitePlayer) {
+	    if (moveGenerator.isKingInCheck(isWhitePlayer)) {
+	        return false; // Not a stalemate if the king is in check
+	    }
+
+	    for (int row = 0; row < SIZE; row++) {
+	        for (int col = 0; col < SIZE; col++) {
+	            ChessPiece piece = boardState[row][col];
+	            if (piece != null && piece.isWhite() == isWhitePlayer) {
+	                List<Point> validMoves = moveGenerator.getValidMovesForPiece(row, col);
+	                if (!validMoves.isEmpty()) {
+	                    return false; // There is at least one legal move
+	                }
+	            }
+	        }
+	    }
+
+	    return true; // No legal moves available, and the king is not in check
+	}
+
 	
 
 	public void highlightValidMoves(int row, int col) {
@@ -280,13 +299,7 @@ public class ChessBoard extends JFrame {
 	}
 
 	private void movePiece(int newRow, int newCol) {
-		
-		if (isCheckmate(isWhiteTurn)) {// Check if the opponent is in checkmate
-	        endGame(!isWhiteTurn);
-	        selectedPiece = null;
-	    }
-
-		
+			
 		if (selectedPiece != null) {
 			if (isValidMove(selectedRow, selectedCol, newRow, newCol)
 					&& selectedPiece.isWhite == playerColor) {
@@ -316,7 +329,14 @@ public class ChessBoard extends JFrame {
 					boardState[newRow][newCol] = selectedPiece;
 					squares[newRow][newCol].setIcon(selectedPiece.getIcon());
 				}
-
+				if (isStalemate(!isWhiteTurn)) {
+			        handleStalemate();
+			    }
+				if (isCheckmate(!isWhiteTurn)) {// Check if the opponent is in checkmate
+			        endGame(isWhiteTurn);
+			        selectedPiece = null;
+			    }
+				
 				// Switch turns and update the turn label
 				isWhiteTurn = !isWhiteTurn;
 				turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
@@ -344,6 +364,28 @@ public class ChessBoard extends JFrame {
 			}
 		}
 	}
+	
+	private void handleStalemate() {
+        // Notify the players of the stalemate
+        int option = JOptionPane.showOptionDialog(
+            null, 
+            "Stalemate! The game is a draw.\nWould you like to play again?", 
+            "Game Drawn", 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.INFORMATION_MESSAGE, 
+            null, 
+            new String[]{"Reset Board", "Close Game"}, 
+            "Reset Board"
+        );
+
+        if (option == JOptionPane.YES_OPTION) {
+        	dispose();
+        	ChessLobby lobby = new ChessLobby();
+            lobby.setVisible(true);
+        } else {
+            System.exit(0); // Close the application
+        }
+    }
 	
 	private void endGame(boolean isWhiteWinner) {
 		String winner = isWhiteWinner ? "White" : "Black";
@@ -378,11 +420,7 @@ public class ChessBoard extends JFrame {
 	 * be used in ai control after copying it with the movepiece method.
 	 */
 	public void aiMovePiece(ChessPiece k, int newRow, int newCol) {
-		
-		if (isCheckmate(isWhiteTurn)) {// Check if the opponent is in checkmate
-	        endGame(!isWhiteTurn);
-	    }
-		
+				
 		selectedPiece = k;
 
 		if (selectedPiece != null) {
@@ -416,6 +454,14 @@ public class ChessBoard extends JFrame {
 					squares[newRow][newCol].setIcon(selectedPiece.getIcon());
 				}
 
+				if (isStalemate(!isWhiteTurn)) {
+			        handleStalemate();
+			    }
+				if (isCheckmate(!isWhiteTurn)) {// Check if the opponent is in checkmate
+			        endGame(isWhiteTurn);
+			        selectedPiece = null;
+			    }
+				
 				// Switch turns and update the turn label
 				isWhiteTurn = !isWhiteTurn;
 				turnLabel.setText(isWhiteTurn ? "White's turn" : "Black's turn");
