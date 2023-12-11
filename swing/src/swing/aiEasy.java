@@ -10,13 +10,16 @@ import swing.ChessBoard.ChessPiece.PieceType;
 
 public class aiEasy {
 
-	public boolean myColor = false;
+	public boolean myColor;
 	public MoveGenerator generator;// similer with moveGenerator
 	private ChessPiece[][] state;// similar with boardstate in chessBoard
 	private ChessPiece st;// similar with slectedPiece in chessBoard
 	private boolean cmove;// can not move true->can not move.
-	
-	
+	private boolean check;
+	private boolean immovable;
+	List<Point> bestM = new ArrayList<>();
+	List<ChessPiece> pieces = new ArrayList<>();
+
 	public int a = 0;
 
 	// for selectedPiece
@@ -25,24 +28,52 @@ public class aiEasy {
 	public List<Point> select(ChessBoard board) {
 		int bestMoveScore = Integer.MIN_VALUE;
 		List<Point> bestMove = new ArrayList<>();
+		// 내말이 체크면,
+		if (myColor == true && generator.isKingInCheck(true) || myColor == false && generator.isKingInCheck(false)) {
+			check = true;
+		} else {
+			check = false;
+		}
+		// true면
 		for (int i = 0; i < 8; i++) {
 			for (int m = 0; m < 8; m++) {
 				if (board.d()[i][m] != null && board.d()[i][m].isWhite() == myColor) {
 
-					calculate(i, m, board.d()[i][m]);
-					if (cmove == true) {
+					bestMove = calculate(i, m, board.d()[i][m]);
+					dma(i, m, board);
+					if (cmove == true || immovable == true) {
 						continue;
 					} else if (cmove != true) {
-						bestMove = calculate(i, m, board.d()[i][m]);
+						// bestMove = calculate(i, m, board.d()[i][m]);
 						st = board.d()[i][m];
 						st.points = new Point(i, m);
-						
 					}
+					if(check == true) {
+						bestM.addAll(bestMove);
+						pieces.add(st);
+						return bestM;
+					}
+
 				}
 			}
 		}
 		return bestMove;
 	}
+
+	public boolean dma(int a, int b, ChessBoard board) {
+
+		ChessPiece tem = board.d()[a][b];
+		board.d()[a][b] = null;
+
+		if (myColor == true && generator.isKingInCheck(true) || myColor == false && generator.isKingInCheck(false)) {
+			immovable = true;
+		} else {
+			immovable = false;
+		}
+		board.d()[a][b] = tem;
+		return immovable;
+	}
+
 	// Determine the type of chess piece based on the current point and move to a
 	// higher score within the range where the corresponding chess piece can move.
 	public List<Point> calculate(int startX, int startY, ChessPiece chess) {
@@ -51,29 +82,35 @@ public class aiEasy {
 
 		List<Point> bestMoves = new ArrayList<>();
 
-		switch (chess.getType()) {
-		case PAWN:
-			bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
-			break;
-		case ROOK:
-			bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidRookMoves(startX, startY));
-			break;
-		case BISHOP:
-			bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidBishopMoves(startX, startY));
-			break;
-		case QUEEN:
-			bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidQueenMoves(startX, startY));
-			break;
-		case KING:
-			bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidKingMoves(startX, startY));
-			break;
-		case KNIGHT:
-			bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidKnightMoves(startX, startY));
-			break;
-		default:
-			bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
-			break;
+		if (check == true) {
+			bestMoves = find(startX, startY, betterScore, bestMoves,
+					generator.getMovesThatResolveCheck(startX, startY, chess));
+		} else {
+			switch (chess.getType()) {
+			case PAWN:
+				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
+				break;
+			case ROOK:
+				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidRookMoves(startX, startY));
+				break;
+			case BISHOP:
+				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidBishopMoves(startX, startY));
+				break;
+			case QUEEN:
+				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidQueenMoves(startX, startY));
+				break;
+			case KING:
+				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidKingMoves(startX, startY));
+				break;
+			case KNIGHT:
+				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidKnightMoves(startX, startY));
+				break;
+			default:
+				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
+				break;
+			}
 		}
+
 		return bestMoves;
 	}
 
@@ -87,15 +124,16 @@ public class aiEasy {
 		state = bd;
 		// ChessPiece selectPiece;
 		bestMove1 = select(board);
-		a = (int) (Math.random()*bestMove1.size());
-		
+		a = (int) (Math.random() * bestMove1.size());
+
 		if (bestMove1.isEmpty() != true) {
 			board.aiMovePiece(st, bestMove1.get(a).x, bestMove1.get(a).y);
 		} else {
 			board.aiMovePiece(st, bestMove1.get(a).x, bestMove1.get(a).y);
 		}
+		bestM.clear();
 
-	}
+	}// ai흰색가 체크면 aiColor = true, moveGenerator.isKingInCheck(true) 이건 흰색 체크인 상황
 
 	// How to find the highest score. It's also added to prevent the selected piece
 	// from being unable to move.
@@ -109,10 +147,10 @@ public class aiEasy {
 						betterScore = sc(state[move.x][move.y]);
 						bestMoves.clear();
 						bestMoves.add(new Point(move.x, move.y));
-						
+
 					} else if (betterScore == sc(state[move.x][move.y])) {
 						bestMoves.add(new Point(move.x, move.y));
-						
+
 					} else if (betterScore > sc(state[move.x][move.y])) {
 						continue;
 					}

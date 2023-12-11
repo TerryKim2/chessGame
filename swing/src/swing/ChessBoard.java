@@ -130,8 +130,8 @@ public class ChessBoard extends JFrame {
 	}
 
 	private void initializePieces(int row, int col) {
-		//String basePath = System.getProperty("user.dir") + "\\src\\pieces\\"; // Replace with the actual path
-		String basePath ="swing/src/pieces/";
+		String basePath = System.getProperty("user.dir") + "\\src\\pieces\\"; // Replace with the actual path
+		//String basePath ="swing/src/pieces/";
 		boolean isWhite = !(row < 2); // White pieces are in the first two rows
 		String colorPrefix = isWhite ? "w" : "b"; // 'w' for white, 'b' for black
 
