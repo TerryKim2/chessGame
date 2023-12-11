@@ -21,7 +21,7 @@ public class FileStoreUtility {
      */
     public void writeGameResultToFileStore(String difficulty, String result) {
         try {
-            FileWriter writer = new FileWriter(getClass().getClassLoader().getResource("GameHistory.txt").getFile(), true);
+            FileWriter writer = new FileWriter(getClass().getClassLoader().getResource("GameHistory.txt").getPath(), true);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
             DateFormat dateFormat1 = new SimpleDateFormat("MM/dd/yyyy");
             DateFormat dateFormat2 = new SimpleDateFormat("HH:mm");

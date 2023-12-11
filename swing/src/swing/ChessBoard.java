@@ -148,29 +148,29 @@ public class ChessBoard extends JFrame {
 	 * @param col
 	 */
 	private void initializePieces(int row, int col) {
-		String basePath = "\\pieces\\"; // Replace with the actual path
-		// String basePath ="swing/src/pieces/";
+		//String basePath = "\\pieces\\"; // Replace with the actual path
+		//String basePath =getClass().getClassLoader().getResource("pieces").getPath();
 		boolean isWhite = !(row < 2); // White pieces are in the first two rows
 		String colorPrefix = isWhite ? "w" : "b"; // 'w' for white, 'b' for black
 
 		if (row == 1 || row == 6) {
-			boardState[row][col] = new ChessPiece(basePath + colorPrefix + "pawn.png", isWhite,
+			boardState[row][col] = new ChessPiece(colorPrefix + "pawn.png", isWhite,
 					ChessPiece.PieceType.PAWN);
 		} else if (row == 0 || row == 7) {
 			if (col == 0 || col == 7) {
-				boardState[row][col] = new ChessPiece(basePath + colorPrefix + "rook.png", isWhite,
+				boardState[row][col] = new ChessPiece(colorPrefix + "rook.png", isWhite,
 						ChessPiece.PieceType.ROOK);
 			} else if (col == 1 || col == 6) {
-				boardState[row][col] = new ChessPiece(basePath + colorPrefix + "knight.png", isWhite,
+				boardState[row][col] = new ChessPiece(colorPrefix + "knight.png", isWhite,
 						ChessPiece.PieceType.KNIGHT);
 			} else if (col == 2 || col == 5) {
-				boardState[row][col] = new ChessPiece(basePath + colorPrefix + "bishop.png", isWhite,
+				boardState[row][col] = new ChessPiece(colorPrefix + "bishop.png", isWhite,
 						ChessPiece.PieceType.BISHOP);
 			} else if (col == 3) {
-				boardState[row][col] = new ChessPiece(basePath + colorPrefix + "queen.png", isWhite,
+				boardState[row][col] = new ChessPiece(colorPrefix + "queen.png", isWhite,
 						ChessPiece.PieceType.QUEEN);
 			} else if (col == 4) {
-				boardState[row][col] = new ChessPiece(basePath + colorPrefix + "king.png", isWhite,
+				boardState[row][col] = new ChessPiece(colorPrefix + "king.png", isWhite,
 						ChessPiece.PieceType.KING);
 			}
 		}
@@ -566,18 +566,18 @@ public class ChessBoard extends JFrame {
 	 * @return
 	 */
 	private String getImagePathForPieceType(ChessPiece.PieceType type, boolean isWhite) {
-		String basePath = System.getProperty("user.dir") + "\\src\\pieces\\";
+		//String basePath = System.getProperty("user.dir") + "\\src\\pieces\\";
 		String colorPrefix = isWhite ? "w" : "b";
 		switch (type) {
 		case ROOK:
-			return basePath + colorPrefix + "rook.png";
+			return colorPrefix + "rook.png";
 		case BISHOP:
-			return basePath + colorPrefix + "bishop.png";
+			return colorPrefix + "bishop.png";
 		case KNIGHT:
-			return basePath + colorPrefix + "knight.png";
+			return colorPrefix + "knight.png";
 		case QUEEN:
 		default:
-			return basePath + colorPrefix + "queen.png";
+			return colorPrefix + "queen.png";
 		}
 	}
 
@@ -706,7 +706,7 @@ public class ChessBoard extends JFrame {
 
 		public ChessPiece(String imagePath, boolean isWhite, PieceType type) {
 			this.isWhite = isWhite;
-			this.icon = new ImageIcon(imagePath);
+			this.icon = new ImageIcon(getClass().getClassLoader().getResource(imagePath));
 			this.type = type;
 		}
 

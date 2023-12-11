@@ -86,7 +86,7 @@ public class HistoryGUI extends JFrame {
         Object columns[] = {"Date", "Time", "Difficulty Level", "Result"};
         List<Object[]> rows = new ArrayList<Object[]>();
         try {
-            FileReader reader = new FileReader(getClass().getClassLoader().getResource("GameHistory.txt").getFile());
+            FileReader reader = new FileReader(getClass().getClassLoader().getResource("GameHistory.txt").getPath());
             BufferedReader bufferedReader = new BufferedReader(reader);
 
             String line;
