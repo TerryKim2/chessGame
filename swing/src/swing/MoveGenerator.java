@@ -5,17 +5,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import swing.ChessBoard.ChessPiece;
+
+/**
+ * Move manager for generating lists of possible moves for each piece. 
+ * @author Joshua
+ */
+
 
 public class MoveGenerator {
 	private ChessPiece[][] boardState;
-	private static final int SIZE = 8; // Assuming SIZE is your board size
-
+	private static final int SIZE = 8;
 	public MoveGenerator(ChessPiece[][] boardState) {
 		this.boardState = boardState;
 	}
 
+	/**
+	 * Generates all possible moves for knight
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	public List<Point> getValidKnightMoves(int row, int col) {
 	    List<Point> validMoves = new ArrayList<>();
 	    int[][] moves = {
@@ -38,7 +48,13 @@ public class MoveGenerator {
 	    return validMoves;
 	}
 
-	
+	/**
+	 * Generates all possible moves for king while filtering out
+	 * moves that would result in a check
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	public List<Point> getValidKingMoves(int row, int col) {
 		boolean isWhite = boardState[row][col].isWhite();
         List<Point> validMoves = new ArrayList<>();
@@ -61,7 +77,14 @@ public class MoveGenerator {
                 .collect(Collectors.toList());
     }
 	
-	
+	/**
+	 * Helper method for the getValidKingMoves method to ensure that
+	 * the king is not moving into check
+	 * @param row
+	 * @param col
+	 * @param isWhiteKing
+	 * @return
+	 */
 	private boolean isSquareUnderAttack(int row, int col, boolean isWhiteKing) {
 	    // Check for threats from knights, rooks, bishops, queens, and king
 	    for (int r = 0; r < SIZE; r++) {
@@ -97,7 +120,12 @@ public class MoveGenerator {
 	}
 
 
-
+	/**
+	 * Generates all possible moves for bishop
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	public List<Point> getValidBishopMoves(int row, int col) {
 		List<Point> validMoves = new ArrayList<>();
 
@@ -129,6 +157,12 @@ public class MoveGenerator {
 		return validMoves;
 	}
 
+	/**
+	 * Generates all possible moves for rook
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	public List<Point> getValidRookMoves(int row, int col) {
 		List<Point> validMoves = new ArrayList<>();
 
@@ -178,6 +212,13 @@ public class MoveGenerator {
 		return validMoves;
 	}
 
+	/**
+	 * Generates all possible moves for queen by calling both the
+	 * rook and bishop methods
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	public List<Point> getValidQueenMoves(int row, int col) {
 		List<Point> validMoves = new ArrayList<>();
 
@@ -190,6 +231,12 @@ public class MoveGenerator {
 		return validMoves;
 	}
 
+	/**
+	 * Generates all possible moves for pawns
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	public List<Point> getValidPawnMoves(int row, int col) {
 		List<Point> validMoves = new ArrayList<>();
 		int direction = boardState[row][col].isWhite() ? -1 : 1; // White moves up (-1), Black moves down (+1)
@@ -222,8 +269,15 @@ public class MoveGenerator {
 		return validMoves;
 	}
 
+	/**
+	 * En passant is possible only if the pawn moves diagonally to an empty square
+	 * @param currentRow
+	 * @param currentCol
+	 * @param targetRow
+	 * @param targetCol
+	 * @return
+	 */
 	public boolean isEnPassant(int currentRow, int currentCol, int targetRow, int targetCol) {
-		// En passant is possible only if the pawn moves diagonally to an empty square
 		if (isSquareEmpty(targetRow, targetCol) && Math.abs(targetCol - currentCol) == 1) {
 			// The row where we expect to find the opponent's pawn
 			int opponentPawnRow = currentRow;
@@ -239,18 +293,45 @@ public class MoveGenerator {
 		return false;
 	}
 
+	/**
+	 * Helper method to ensure a square contains an enemy piece when taking a piece
+	 * @param row
+	 * @param col
+	 * @param isWhite
+	 * @return
+	 */
 	private boolean isOpponentPiece(int row, int col, boolean isWhite) {
 		return !isSquareEmpty(row, col) && boardState[row][col].isWhite() != isWhite;
 	}
 
+	/**
+	 * Helper method to check if a square contains a piece
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	private boolean isSquareEmpty(int row, int col) {
 		return isWithinBoard(row, col) && boardState[row][col] == null;
 	}
 
+	/**
+	 * Ensures that movements outside the scope of the board are not allowed
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	private boolean isWithinBoard(int row, int col) {
 		return row >= 0 && row < SIZE && col >= 0 && col < SIZE;
 	}
 
+	/**
+	 * Helper method for diagonal movement for bishops
+	 * @param moves
+	 * @param row
+	 * @param col
+	 * @param isWhite
+	 * @return
+	 */
 	private boolean addMoveIfValid(List<Point> moves, int row, int col, boolean isWhite) {
 		if (isSquareEmpty(row, col)) {
 			moves.add(new Point(row, col));
@@ -261,6 +342,15 @@ public class MoveGenerator {
 		return false; // Stop in this direction
 	}
 
+	/**
+	 * Simulates movement to see if a move will land a king in check
+	 * @param startRow
+	 * @param startCol
+	 * @param endRow
+	 * @param endCol
+	 * @param isWhite
+	 * @return
+	 */
 	public boolean movePutsKingInCheck(int startRow, int startCol, int endRow, int endCol, boolean isWhite) {
 	    // Simulate the move
 	    ChessPiece tempPiece = boardState[endRow][endCol];
@@ -277,6 +367,11 @@ public class MoveGenerator {
 	    return isInCheck;
 	}
 
+	/**
+	 * Checks to see if the current players king is in check.
+	 * @param isWhiteKing
+	 * @return
+	 */
 	public boolean isKingInCheck(boolean isWhiteKing) {
 	    // Find the king's position
 	    int kingRow = -1, kingCol = -1;
@@ -310,6 +405,15 @@ public class MoveGenerator {
 	    return false; // The king is not in check
 	}
 	
+	/**
+	 * Generates a list of moves that would get a king out of check. This allows
+	 * for the only available moves if a king is in check to be moves that exit
+	 * check.
+	 * @param row
+	 * @param col
+	 * @param piece
+	 * @return
+	 */
 	public List<Point> getMovesThatResolveCheck(int row, int col, ChessPiece piece) {
 	    List<Point> movesThatResolveCheck = new ArrayList<>();
 	    List<Point> validMoves = getValidMovesForPiece(row, col);
@@ -332,8 +436,12 @@ public class MoveGenerator {
 	    return movesThatResolveCheck;
 	}
 
-
-
+	/**
+	 * Helper method to call each piece for their list of moves
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	public List<Point> getValidMovesForPiece(int row, int col) {
 	    ChessPiece piece = boardState[row][col];
 	    if (piece == null) return Collections.emptyList();
@@ -349,7 +457,11 @@ public class MoveGenerator {
 	    }
 	}
 
-	
+	/**
+	 * helper method to find position of both kings to ensure kings cannot
+	 * enter squares nex to each other.
+	 * @return
+	 */
 	public Point[] findKingPositions() {
         Point whiteKingPosition = null;
         Point blackKingPosition = null;
