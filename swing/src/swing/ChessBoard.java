@@ -111,7 +111,7 @@ public class ChessBoard extends JFrame {
 	}
 
 	public void gameManager() {
-		// turn true면 플레이어 턴
+		// if turn == true, player turn
 		kingInCheckHighlight();
 
 		if (easy == true) {

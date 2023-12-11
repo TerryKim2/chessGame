@@ -20,6 +20,8 @@ public class aiNormal {
 	public int nScore = 0;
 	public int randomValue = 0;
 	List<ChessPiece> pieces = new ArrayList<>();
+	private boolean check;
+	private boolean immovable;
 
 	// for selectedPiece
 	// AI chess pieces that can be moved make the highest-scoring moves after
@@ -30,12 +32,21 @@ public class aiNormal {
 		List<Point> totalMove = new ArrayList<>();
 		pieces = new ArrayList<>();
 		int count = 0;
+		
+		if (myColor == true && generator.isKingInCheck(true) || myColor == false && generator.isKingInCheck(false)) {
+			check = true;
+		} else {
+			check = false;
+		}
+		
 		for (int i = 0; i < 8; i++) {
 			for (int m = 0; m < 8; m++) {
 				if (board.d()[i][m] != null && board.d()[i][m].isWhite() == myColor) {
 					count++;
 					bestMove = calculate(i, m, board.d()[i][m]);
-					if (cmove == true) {
+					dma(i, m, board);
+					//해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
+					if (cmove == true || immovable == true) {
 						continue;
 					} else if (cmove != true) {
 						st = board.d()[i][m];
@@ -54,11 +65,26 @@ public class aiNormal {
 				}
 			}
 		}
-		
+
 		btScore = 0;
 		return totalMove;
 	}
 
+	//해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
+	public boolean dma(int a, int b, ChessBoard board) {
+		
+		ChessPiece tem = board.d()[a][b];
+		board.d()[a][b] = null;
+		
+		if (myColor == true && generator.isKingInCheck(true) || myColor == false && generator.isKingInCheck(false)) {
+			immovable = true;
+		} else {
+			immovable = false;
+		}
+		board.d()[a][b] = tem;
+		return immovable;
+	}
+	
 	// Determine the type of chess piece based on the current point and move to a
 	// higher score within the range where the corresponding chess piece can move.
 	public List<Point> calculate(int startX, int startY, ChessPiece chess) {
@@ -66,31 +92,34 @@ public class aiNormal {
 		int betterScore = 0;
 
 		List<Point> bestMoves = new ArrayList<>();
-
-		switch (chess.getType()) {
-		case PAWN:
-			find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
-			break;
-		case ROOK:
-			find(startX, startY, betterScore, bestMoves, generator.getValidRookMoves(startX, startY));
-			break;
-		case BISHOP:
-			find(startX, startY, betterScore, bestMoves, generator.getValidBishopMoves(startX, startY));
-			break;
-		case QUEEN:
-			find(startX, startY, betterScore, bestMoves, generator.getValidQueenMoves(startX, startY));
-			break;
-		case KING:
-			find(startX, startY, betterScore, bestMoves, generator.getValidKingMoves(startX, startY));
-			break;
-		case KNIGHT:
-			find(startX, startY, betterScore, bestMoves, generator.getValidKnightMoves(startX, startY));
-			break;
-		default:
-			find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
-			break;
+		if (check == true) {
+			bestMoves = find(startX, startY, betterScore, bestMoves,
+					generator.getMovesThatResolveCheck(startX, startY, chess));
+		} else {
+			switch (chess.getType()) {
+			case PAWN:
+				find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
+				break;
+			case ROOK:
+				find(startX, startY, betterScore, bestMoves, generator.getValidRookMoves(startX, startY));
+				break;
+			case BISHOP:
+				find(startX, startY, betterScore, bestMoves, generator.getValidBishopMoves(startX, startY));
+				break;
+			case QUEEN:
+				find(startX, startY, betterScore, bestMoves, generator.getValidQueenMoves(startX, startY));
+				break;
+			case KING:
+				find(startX, startY, betterScore, bestMoves, generator.getValidKingMoves(startX, startY));
+				break;
+			case KNIGHT:
+				find(startX, startY, betterScore, bestMoves, generator.getValidKnightMoves(startX, startY));
+				break;
+			default:
+				find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
+				break;
+			}
 		}
-
 		return bestMoves;
 	}
 
@@ -103,25 +132,25 @@ public class aiNormal {
 		generator = mv;
 		state = bd;
 		// ChessPiece selectPiece;
-		
+
 		bestMove1 = select(board);
 		randomValue = (int) (Math.random() * bestMove1.size());
-		//if(bestMove1.size() != 0) {
-		if(pieces.size() == 1) {
+		// if(bestMove1.size() != 0) {
+		if (pieces.size() == 1) {
 			randomValue = 0;
-		} else if(pieces.size() != 1) {
+		} else if (pieces.size() != 1) {
 			randomValue = (int) (Math.random() * bestMove1.size());
 		}
 		System.out.println("SIZE OF PIECES LIST: " + pieces.size());
 		System.out.println("RANDOM VALUE: " + randomValue);
 		st = pieces.get(randomValue);
-		
+
 		if (bestMove1.isEmpty() != true) {
 			board.aiMovePiece(st, bestMove1.get(randomValue).x, bestMove1.get(randomValue).y);
 		} else {
 			board.aiMovePiece(st, bestMove1.get(randomValue).x, bestMove1.get(randomValue).y);
 		}
-		//}
+		// }
 
 	}
 
