@@ -8,13 +8,24 @@ import java.util.List;
 import swing.ChessBoard.ChessPiece;
 import swing.ChessBoard.ChessPiece.PieceType;
 
+/**
+ * It was improved based on the easy difficulty level, and if there are multiple
+ * cases with the same score, it is designed to move randomly.
+ * 
+ * @author cubby(Donghwan)
+ *
+ */
 public class aiNormal {
 
 	public boolean myColor = false;
-	public MoveGenerator generator;// similer with moveGenerator
-	private ChessPiece[][] state;// similar with boardstate in chessBoard
-	private ChessPiece st;// similar with slectedPiece in chessBoard
-	private boolean cmove;// can not move true->can not move.
+	public MoveGenerator generator;
+	/** similer with moveGenerator */
+	private ChessPiece[][] state;
+	/** similar with boardstate in chessBoard */
+	private ChessPiece st;
+	/** similar with slectedPiece in chessBoard */
+	private boolean cmove;
+	/** can not move true->can not move. */
 
 	public int btScore = 0;
 	public int nScore = 0;
@@ -22,9 +33,10 @@ public class aiNormal {
 	List<ChessPiece> pieces = new ArrayList<>();
 	private boolean check;
 
-	// for selectedPiece
-	// AI chess pieces that can be moved make the highest-scoring moves after
-	// checking the places where they can move.
+	/**
+	 * for selectedPiece AI chess pieces that can be moved make the highest-scoring
+	 * moves after checking the places where they can move.
+	 */
 	public List<Point> select(ChessBoard board) {
 		int bestMoveScore = Integer.MIN_VALUE;
 		List<Point> bestMove = new ArrayList<>();
@@ -37,19 +49,12 @@ public class aiNormal {
 		} else {
 			check = false;
 		}
-		/*
-		 * for (int a = 0; a < 8; a++) { for (int b = 0; b < 8; b++) { if
-		 * (board.d()[a][b] != null && board.d()[a][b].isWhite() == myColor) { bestMove
-		 * = generator.getMovesThatResolveCheck(a, b, board.d()[a][b]); if
-		 * (bestMove.size() > 0) { totalMove.addAll(bestMove); st = board.d()[a][b];
-		 * st.points = new Point(a, b); pieces.add(st); } } } }
-		 */
 
 		for (int i = 0; i < 8; i++) {
 			for (int m = 0; m < 8; m++) {
 				if (board.d()[i][m] != null && board.d()[i][m].isWhite() == myColor) {
 					bestMove = calculate(i, m, board.d()[i][m]);
-					// 해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
+					/** cmove == can not move */
 					if (cmove == true) {
 						continue;
 					} else if (cmove != true) {
@@ -76,8 +81,10 @@ public class aiNormal {
 		return totalMove;
 	}
 
-	// Determine the type of chess piece based on the current point and move to a
-	// higher score within the range where the corresponding chess piece can move.
+	/**
+	 * Determine the type of chess piece based on the current point and move to a
+	 * higher score within the range where the corresponding chess piece can move.
+	 */
 	public List<Point> calculate(int startX, int startY, ChessPiece chess) {
 
 		int betterScore = 0;
@@ -88,13 +95,11 @@ public class aiNormal {
 			find(startX, startY, betterScore, bestMoves, generator.getMovesThatResolveCheck(startX, startY, chess));
 		} else if (check == false) {
 			find(startX, startY, betterScore, bestMoves, generator.getMovesThatResolveCheck(startX, startY, chess));
-			}
-		
-
+		}
 		return bestMoves;
 	}
 
-	/*
+	/**
 	 * A method of receiving information from a chess board, sending information to
 	 * methods existing in aicontrol, and moving AI's chess pieces based on this.
 	 */
@@ -102,7 +107,7 @@ public class aiNormal {
 		List<Point> bestMove1 = null;
 		generator = mv;
 		state = bd;
-		// ChessPiece selectPiece;
+		/** ChessPiece selectPiece; */
 		bestMove1 = select(board);
 		randomValue = (int) (Math.random() * bestMove1.size());
 
@@ -124,12 +129,12 @@ public class aiNormal {
 			board.aiMovePiece(st, 0, 0);
 		}
 
-
-
 	}
 
-	// How to find the highest score. It's also added to prevent the selected piece
-	// from being unable to move.
+	/**
+	 * How to find the highest score. It's also added to prevent the selected piece
+	 * from being unable to move.
+	 */
 	public List<Point> find(int startX, int startY, int betterScore, List<Point> bestMoves, List<Point> moveGenerator) {
 		List<Point> validMoves = new ArrayList<>();
 		if (!moveGenerator.isEmpty()) {
@@ -166,8 +171,10 @@ public class aiNormal {
 		}
 	}
 
-	// Scores are given according to the type of piece that exists in the movable
-	// compartment.
+	/**
+	 * Scores are given according to the type of piece that exists in the movable
+	 * compartment.
+	 */
 	public int sc(ChessPiece chess) {
 		int score = 0;
 		switch (chess.getType()) {

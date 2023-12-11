@@ -26,6 +26,11 @@ import javax.swing.Timer;
 import swing.ChessLobby;
 import swing.aiNormal;
 
+/**
+ * 
+ * @author cubby(Donghwan) && Joshua
+ *
+ */
 public class ChessBoard extends JFrame {
 
 	private static final int SIZE = 8; // Chess board size
@@ -47,8 +52,8 @@ public class ChessBoard extends JFrame {
 	public boolean aiColor;
 	public boolean easy;// true = easy, false = normal.
 
-	public aiNormal ai;// normal mode
-	public aiEasy aiE;// easy mode
+	public aiNormal ai;/** normal mode*/
+	public aiEasy aiE;/** easy mode*/
 
 	public ChessPiece[][] d() {
 		return boardState;
@@ -94,6 +99,7 @@ public class ChessBoard extends JFrame {
 		add(statusPanel, BorderLayout.SOUTH);
 
 		moveGenerator = new MoveGenerator(boardState);
+		/**After running it for the first time, it was created to be managed through gameManager.*/
 		if (easy == true) {
 			aiE = new aiEasy();
 			aiE.myColor = aiColor;
@@ -109,7 +115,7 @@ public class ChessBoard extends JFrame {
 		}
 
 	}
-
+	/**I received the difficulty information from the lobby and used it, and if it's ai's turn, ai.controller is applied.*/
 	public void gameManager() {
 		// if turn == true, player turn
 		kingInCheckHighlight();
@@ -131,7 +137,7 @@ public class ChessBoard extends JFrame {
 
 	private void initializePieces(int row, int col) {
 		String basePath = System.getProperty("user.dir") + "\\src\\pieces\\"; // Replace with the actual path
-		//String basePath ="swing/src/pieces/";
+		// String basePath ="swing/src/pieces/";
 		boolean isWhite = !(row < 2); // White pieces are in the first two rows
 		String colorPrefix = isWhite ? "w" : "b"; // 'w' for white, 'b' for black
 
@@ -161,8 +167,6 @@ public class ChessBoard extends JFrame {
 			squares[row][col].setIcon(boardState[row][col].getIcon());
 		}
 	}
-	
-	
 
 	private class ButtonListener implements ActionListener {
 		private int row, col;
@@ -171,7 +175,7 @@ public class ChessBoard extends JFrame {
 			this.row = row;
 			this.col = col;
 		}
-				
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (turn == true) {
@@ -192,84 +196,76 @@ public class ChessBoard extends JFrame {
 			}
 		}
 	}
-	
-	
+
 	public void kingInCheckHighlight() {
-        Point[] kingPositions = moveGenerator.findKingPositions();
-        boolean whiteKingInCheck = moveGenerator.isKingInCheck(true);
-        boolean blackKingInCheck = moveGenerator.isKingInCheck(false);
+		Point[] kingPositions = moveGenerator.findKingPositions();
+		boolean whiteKingInCheck = moveGenerator.isKingInCheck(true);
+		boolean blackKingInCheck = moveGenerator.isKingInCheck(false);
 
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                Color squareColor = (row + col) % 2 == 0 ? ltan : dtan;
-                squares[row][col].setBackground(squareColor); // Reset to default color
+		for (int row = 0; row < 8; row++) {
+			for (int col = 0; col < 8; col++) {
+				Color squareColor = (row + col) % 2 == 0 ? ltan : dtan;
+				squares[row][col].setBackground(squareColor); // Reset to default color
 
-                if (whiteKingInCheck && kingPositions[0].equals(new Point(row, col)) ||
-                    blackKingInCheck && kingPositions[1].equals(new Point(row, col))) {
-                    highlightKingInCheck(squares[row][col]); // Highlight the king's square
-                }
-            }
-        }
-    }
-	
+				if (whiteKingInCheck && kingPositions[0].equals(new Point(row, col))
+						|| blackKingInCheck && kingPositions[1].equals(new Point(row, col))) {
+					highlightKingInCheck(squares[row][col]); // Highlight the king's square
+				}
+			}
+		}
+	}
+
 	private void highlightKingInCheck(JButton squares2) {
-        squares2.setBackground(Color.RED); // Example: setting the background to red
-        // You can also add other visual indicators like a border or icon
-    }
-	
+		squares2.setBackground(Color.RED); // Example: setting the background to red
+		// You can also add other visual indicators like a border or icon
+	}
+
 	private boolean isCheckmate(boolean isWhitePlayer) {
 		System.out.print("Is ");
 		System.out.print(isWhitePlayer ? "White" : "Black");
 		System.out.println(" in check? : " + moveGenerator.isKingInCheck(isWhitePlayer));
 		System.out.println();
-	    if (!moveGenerator.isKingInCheck(isWhitePlayer)) {
-	        return false; // Not in checkmate if the king is not in check
-	    }
+		if (!moveGenerator.isKingInCheck(isWhitePlayer)) {
+			return false; // Not in checkmate if the king is not in check
+		}
 
-	    // Check if any move can get the king out of check
-	    for (int row = 0; row < SIZE; row++) {
-	        for (int col = 0; col < SIZE; col++) {
-	            ChessPiece piece = boardState[row][col];
-	            if (piece != null && piece.isWhite() == isWhitePlayer) {
-	                List<Point> validMoves = moveGenerator.getValidMovesForPiece(row, col);
-	                for (Point move : validMoves) {
-	                    if (!moveGenerator.movePutsKingInCheck(row, col, move.x, move.y, isWhitePlayer)) {
-	                        return false; // Found a move that can get the king out of check
-	                    }
-	                }
-	            }
-	        }
-	    }
+		// Check if any move can get the king out of check
+		for (int row = 0; row < SIZE; row++) {
+			for (int col = 0; col < SIZE; col++) {
+				ChessPiece piece = boardState[row][col];
+				if (piece != null && piece.isWhite() == isWhitePlayer) {
+					List<Point> validMoves = moveGenerator.getValidMovesForPiece(row, col);
+					for (Point move : validMoves) {
+						if (!moveGenerator.movePutsKingInCheck(row, col, move.x, move.y, isWhitePlayer)) {
+							return false; // Found a move that can get the king out of check
+						}
+					}
+				}
+			}
+		}
 
-	    return true; // No moves available to escape check, so it's checkmate
+		return true; // No moves available to escape check, so it's checkmate
 	}
-
-	
-	
 
 	public void highlightValidMoves(int row, int col) {
 
+		ChessPiece selectedPiece = boardState[row][col];
 
-    
-        ChessPiece selectedPiece = boardState[row][col];
+		boolean kingInCheck = moveGenerator.isKingInCheck(selectedPiece.isWhite());
+		List<Point> validMoves;
 
+		if (kingInCheck) {
+			validMoves = moveGenerator.getMovesThatResolveCheck(row, col, selectedPiece);
+		} else {
+			validMoves = moveGenerator.getValidMovesForPiece(row, col);
+		}
 
-        boolean kingInCheck = moveGenerator.isKingInCheck(selectedPiece.isWhite());
-        List<Point> validMoves;
-
-        if (kingInCheck) {
-            validMoves = moveGenerator.getMovesThatResolveCheck(row, col, selectedPiece);
-        } else {
-            validMoves = moveGenerator.getValidMovesForPiece(row, col);
-        }
-
-	    // Highlight the valid moves
-	    for (Point move : validMoves) {
-	    	squares[move.x][move.y].setBackground(Color.GREEN); // Highlight square
-	    }
+		// Highlight the valid moves
+		for (Point move : validMoves) {
+			squares[move.x][move.y].setBackground(Color.GREEN); // Highlight square
+		}
 	}
 
-	
 	private void resetSquareHighlights() {
 		for (int row = 0; row < SIZE; row++) {
 			for (int col = 0; col < SIZE; col++) {
@@ -280,16 +276,14 @@ public class ChessBoard extends JFrame {
 	}
 
 	private void movePiece(int newRow, int newCol) {
-		
-		if (isCheckmate(isWhiteTurn)) {// Check if the opponent is in checkmate
-	        endGame(!isWhiteTurn);
-	        selectedPiece = null;
-	    }
 
-		
+		if (isCheckmate(isWhiteTurn)) {// Check if the opponent is in checkmate
+			endGame(!isWhiteTurn);
+			selectedPiece = null;
+		}
+
 		if (selectedPiece != null) {
-			if (isValidMove(selectedRow, selectedCol, newRow, newCol)
-					&& selectedPiece.isWhite == playerColor) {
+			if (isValidMove(selectedRow, selectedCol, newRow, newCol) && selectedPiece.isWhite == playerColor) {
 
 				if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && Math.abs(newRow - selectedRow) == 2) {
 					selectedPiece.pawnPassant(true);
@@ -344,51 +338,45 @@ public class ChessBoard extends JFrame {
 			}
 		}
 	}
-	
+
 	private void endGame(boolean isWhiteWinner) {
 		String winner = isWhiteWinner ? "White" : "Black";
-		String difficulty = easy? "easy" : "normal";
-		String result = isWhiteWinner ? (playerColor? "win" : "loss") : (playerColor? "loss" : "win");
+		String difficulty = easy ? "easy" : "normal";
+		String result = isWhiteWinner ? (playerColor ? "win" : "loss") : (playerColor ? "loss" : "win");
 		FileStoreUtility.writeGameResultToFileStore(difficulty, result);
-        int option = JOptionPane.showOptionDialog(
-            null, 
-            "Checkmate! " + winner + " wins!\nWould you like to play again?", 
-            "Game Over", 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.INFORMATION_MESSAGE, 
-            null, 
-            new String[]{"Reset Board", "Close Game"}, 
-            "Reset Board"
-        );
+		int option = JOptionPane.showOptionDialog(null,
+				"Checkmate! " + winner + " wins!\nWould you like to play again?", "Game Over",
+				JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+				new String[] { "Reset Board", "Close Game" }, "Reset Board");
 
-        if (option == JOptionPane.YES_OPTION) {
-            //resetBoard();
-        	dispose();
-        	ChessLobby lobby = new ChessLobby();
-            lobby.setVisible(true);
-        } else {
-        	
-            System.exit(0); // Close the application
-        }
+		if (option == JOptionPane.YES_OPTION) {
+			// resetBoard();
+			dispose();
+			ChessLobby lobby = new ChessLobby();
+			lobby.setVisible(true);
+		} else {
+
+			System.exit(0); // Close the application
+		}
 	}
 
-	// aiMove(piece)
-	/*
+	/**associated with ai, Donghwan did it. + gameManager();
+	 * aiMove(piece)
+	 *
 	 * In order to distinguish the movement of the player and ai, it was modified to
 	 * be used in ai control after copying it with the movepiece method.
 	 */
 	public void aiMovePiece(ChessPiece k, int newRow, int newCol) {
-		
+
 		if (isCheckmate(isWhiteTurn)) {// Check if the opponent is in checkmate
-	        endGame(!isWhiteTurn);
-	    }
-		
+			endGame(!isWhiteTurn);
+		}
+
 		selectedPiece = k;
 
 		if (selectedPiece != null) {
 
-			if (isValidMove(k.points.x, k.points.y, newRow, newCol)
-					&& selectedPiece.isWhite == aiColor) {
+			if (isValidMove(k.points.x, k.points.y, newRow, newCol) && selectedPiece.isWhite == aiColor) {
 
 				if (selectedPiece.getType() == ChessPiece.PieceType.PAWN && Math.abs(newRow - k.points.y) == 2) {
 					selectedPiece.pawnPassant(true);
@@ -461,6 +449,7 @@ public class ChessBoard extends JFrame {
 		}
 	}
 
+	/** change pawn randomly */
 	private ChessPiece.PieceType promptForAIPawnPromotion() {
 		Object[] possiblePieces = { "Queen", "Rook", "Bishop", "Knight" };
 		int temp = (int) (Math.random() * possiblePieces.length);
@@ -511,34 +500,32 @@ public class ChessBoard extends JFrame {
 		}
 	}
 
-	
 	public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        ChessPiece piece = boardState[startRow][startCol];
-        if (piece == null) {
-            return false; // No piece at the starting position
-        }
+		ChessPiece piece = boardState[startRow][startCol];
+		if (piece == null) {
+			return false; // No piece at the starting position
+		}
 
-        // Check if the destination square is a valid move for the piece
-        List<Point> validMoves = moveGenerator.getValidMovesForPiece(startRow, startCol);
-        if (!validMoves.contains(new Point(endRow, endCol))) {
-            return false; // Not a valid move for this piece
-        }
+		// Check if the destination square is a valid move for the piece
+		List<Point> validMoves = moveGenerator.getValidMovesForPiece(startRow, startCol);
+		if (!validMoves.contains(new Point(endRow, endCol))) {
+			return false; // Not a valid move for this piece
+		}
 
-        // Simulate the move
-        ChessPiece tempPiece = boardState[endRow][endCol];
-        boardState[endRow][endCol] = piece;
-        boardState[startRow][startCol] = null;
+		// Simulate the move
+		ChessPiece tempPiece = boardState[endRow][endCol];
+		boardState[endRow][endCol] = piece;
+		boardState[startRow][startCol] = null;
 
-        boolean isKingInCheckAfterMove = moveGenerator.isKingInCheck(piece.isWhite());
+		boolean isKingInCheckAfterMove = moveGenerator.isKingInCheck(piece.isWhite());
 
-        // Undo the move
-        boardState[startRow][startCol] = piece;
-        boardState[endRow][endCol] = tempPiece;
+		// Undo the move
+		boardState[startRow][startCol] = piece;
+		boardState[endRow][endCol] = tempPiece;
 
-        // If the move results in the king being in check, it's not valid
-        return !isKingInCheckAfterMove;
-    }
-
+		// If the move results in the king being in check, it's not valid
+		return !isKingInCheckAfterMove;
+	}
 
 	private void indicateWrongMove(int row, int col) {
 		final int flashCount = 2; // Total number of flashes
@@ -571,6 +558,8 @@ public class ChessBoard extends JFrame {
 		private PieceType type;
 		private boolean madeDoubleMove = false;
 		public Point points;
+
+		/** dkim, get points */
 
 		public enum PieceType {
 			PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING

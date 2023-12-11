@@ -1,7 +1,11 @@
 package swing;
 
 import swing.ChessBoard.ChessPiece;
-
+/**
+ * 
+ * @author cubby(Donghwan)
+ *
+ */
 public interface ChessAI{
 	//while
 	void Chess(ChessPiece a, ChessBoard d, int difficult, int color);

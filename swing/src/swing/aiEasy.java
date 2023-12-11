@@ -8,20 +8,34 @@ import java.util.List;
 import swing.ChessBoard.ChessPiece;
 import swing.ChessBoard.ChessPiece.PieceType;
 
+/**
+ * It's designed to move, if I can get the highest score, by examining all the
+ * compartments. But it's very predictable, because I'm supposed to move the
+ * last time I checked.
+ * 
+ * @author cubby(Donghwan)
+ *
+ */
 public class aiEasy {
 
 	public boolean myColor = false;
-	public MoveGenerator generator;// similer with moveGenerator
-	private ChessPiece[][] state;// similar with boardstate in chessBoard
-	private ChessPiece st;// similar with slectedPiece in chessBoard
-	private boolean cmove;// can not move true->can not move.
+	public MoveGenerator generator;
+	/** similer with moveGenerator */
+	private ChessPiece[][] state;
+	/** similar with boardstate in chessBoard */
+	private ChessPiece st;
+	/** similar with slectedPiece in chessBoard */
+	private boolean cmove;
+	/** can not move true->can not move. */
 	private boolean check;
+	/** if true, check. */
 
 	public int a = 0;
 
-	// for selectedPiece
-	// AI chess pieces that can be moved make the highest-scoring moves after
-	// checking the places where they can move.
+	/**
+	 * for selectedPiece AI chess pieces that can be moved make the highest-scoring
+	 * moves after checking the places where they can move.
+	 */
 	public List<Point> select(ChessBoard board) {
 		int bestMoveScore = Integer.MIN_VALUE;
 		List<Point> bestMove = new ArrayList<>();
@@ -50,8 +64,10 @@ public class aiEasy {
 		return bestMove;
 	}
 
-	// Determine the type of chess piece based on the current point and move to a
-	// higher score within the range where the corresponding chess piece can move.
+	/**
+	 * Determine the type of chess piece based on the current point and move to a
+	 * higher score within the range where the corresponding chess piece can move.
+	 */
 	public List<Point> calculate(int startX, int startY, ChessPiece chess) {
 
 		int betterScore = 0;
@@ -67,7 +83,7 @@ public class aiEasy {
 		return bestMoves;
 	}
 
-	/*
+	/**
 	 * A method of receiving information from a chess board, sending information to
 	 * methods existing in acontrol, and moving AI's chess pieces based on this.
 	 */
@@ -75,7 +91,7 @@ public class aiEasy {
 		List<Point> bestMove1 = null;
 		generator = mv;
 		state = bd;
-		// ChessPiece selectPiece;
+		/** ChessPiece selectPiece; */
 		bestMove1 = select(board);
 		a = (int) (Math.random() * bestMove1.size());
 		if (bestMove1.isEmpty() != true) {
@@ -85,8 +101,10 @@ public class aiEasy {
 		}
 	}
 
-	// How to find the highest score. It's also added to prevent the selected piece
-	// from being unable to move.
+	/**
+	 * How to find the highest score. It's also added to prevent the selected piece
+	 * from being unable to move.
+	 */
 	public List<Point> find(int startX, int startY, int betterScore, List<Point> bestMoves, List<Point> moveGenerator) {
 		List<Point> validMoves = new ArrayList<>();
 		if (!moveGenerator.isEmpty()) {
@@ -121,8 +139,10 @@ public class aiEasy {
 		}
 	}
 
-	// Scores are given according to the type of piece that exists in the movable
-	// compartment.
+	/**
+	 * Scores are given according to the type of piece that exists in the movable
+	 * compartment.
+	 */
 	public int sc(ChessPiece chess) {
 		int score = 0;
 		switch (chess.getType()) {

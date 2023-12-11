@@ -6,8 +6,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
-public class ChessLobby extends JFrame {
+/**
+ * 
+ * @author cubby(Donghwan)
+ *
+ */
 
+public class ChessLobby extends JFrame {
+/**
+ * This is the lobby for a chess game. 
+ * There is a button to view previously played game records.
+ *  Click the buttons to play the game, and then receive the basic information to run the chessboard.
+ */
     private JButton startGameButton;
     private JButton historyButton;
     private JButton exitGameButton;
@@ -21,7 +31,7 @@ public class ChessLobby extends JFrame {
     public boolean white;
     public boolean easy;
     public ChessLobby() {
-        // Set up the JFrame
+        /** Set up the JFrame*/
         setTitle("Chess Lobby");
         setSize(1440, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -62,11 +72,11 @@ public class ChessLobby extends JFrame {
         textLabel8.setHorizontalAlignment(JLabel.CENTER);
         textLabel8.setForeground(Color.white);
 
-        // Load the background image
+        /** Load the background image*/
         //backgroundImage = new ImageIcon(System.getProperty("user.dir")+"\\resources\\background.jpg").getImage();
         backgroundImage = new ImageIcon("swing/resources/background.jpg").getImage();
 
-        // Create components
+        /** Create components*/
         startGameButton = new JButton();
         startGameButton.setBounds(470, 206, 500, 150);
         startGameButton.setIcon(img);
@@ -161,7 +171,7 @@ public class ChessLobby extends JFrame {
         bButton.add(textLabel7, BorderLayout.CENTER);
         bButton.setVisible(false);
 
-        // Add components to a custom JPane2
+        /** Add components to a custom JPane2*/
         JPanel contentPane1 = new JPanel() {
             @Override
             protected void paintComponent(Graphics k) {
@@ -181,7 +191,7 @@ public class ChessLobby extends JFrame {
         contentPane1.add(bButton);
 
 
-        // Add ActionListener to the Start Game button
+        /** Add ActionListener to the Start Game button*/
         startGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -202,14 +212,14 @@ public class ChessLobby extends JFrame {
                 historyGUI.setVisible(true);
             }
         });
-        //exit button
+        /**exit button*/
         exitGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.exit(0); // Exit the program
+                System.exit(0); /** Exit the program*/
             }
         });
-        //easy
+        /**get easy mode information*/
         easyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -223,7 +233,7 @@ public class ChessLobby extends JFrame {
                 easy = true;
             }
         });
-        //normal
+        /**get normal mode information*/
         normalButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -238,7 +248,7 @@ public class ChessLobby extends JFrame {
             }
         });
 
-        //select player color as black
+        /**select player color as black*/
         bButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -247,7 +257,7 @@ public class ChessLobby extends JFrame {
                 board.setVisible(true);
             }
         });
-        //select player color as white
+        /**select player color as white*/
         wButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
