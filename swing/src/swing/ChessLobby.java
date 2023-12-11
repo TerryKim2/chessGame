@@ -23,7 +23,7 @@ public class ChessLobby extends JFrame {
     public ChessLobby() {
         // Set up the JFrame
         setTitle("Chess Lobby");
-        setSize(1920, 1080);
+        setSize(1440, 900);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //ImageIcon img = new ImageIcon(System.getProperty("user.dir") + "\\resources\\button_image.png");
         ImageIcon img = new ImageIcon("swing/resources/button_image.png");
@@ -68,7 +68,7 @@ public class ChessLobby extends JFrame {
 
         // Create components
         startGameButton = new JButton();
-        startGameButton.setBounds(710, 256, 500, 150);
+        startGameButton.setBounds(470, 206, 500, 150);
         startGameButton.setIcon(img);
         startGameButton.setFont(new Font("times", Font.BOLD, 50));
         startGameButton.setForeground(Color.WHITE);
@@ -79,7 +79,7 @@ public class ChessLobby extends JFrame {
         startGameButton.add(textLabel1, BorderLayout.CENTER);
 
         historyButton = new JButton();
-        historyButton.setBounds(710, 506, 500, 150);
+        historyButton.setBounds(470, 406, 500, 150);
         historyButton.setIcon(img);
         historyButton.setFont(new Font("times", Font.BOLD, 50));
         historyButton.setForeground(Color.WHITE);
@@ -90,7 +90,7 @@ public class ChessLobby extends JFrame {
         historyButton.add(textLabel8, BorderLayout.CENTER);
 
         exitGameButton = new JButton();
-        exitGameButton.setBounds(710, 756, 500, 150);
+        exitGameButton.setBounds(470, 606, 500, 150);
         exitGameButton.setIcon(img);
         exitGameButton.setFont(new Font("times", Font.BOLD, 50));
         exitGameButton.setForeground(Color.WHITE);
@@ -102,7 +102,7 @@ public class ChessLobby extends JFrame {
         exitGameButton.setVisible(true);
 
         easyButton = new JButton();
-        easyButton.setBounds(710, 403, 500, 150);
+        easyButton.setBounds(470, 303, 500, 150);
         easyButton.setIcon(img);
         easyButton.setFont(new Font("times", Font.BOLD, 50));
         easyButton.setForeground(Color.WHITE);
@@ -114,7 +114,7 @@ public class ChessLobby extends JFrame {
         easyButton.setVisible(false);
 
         normalButton = new JButton();
-        normalButton.setBounds(710, 726, 500, 150);
+        normalButton.setBounds(470, 526, 500, 150);
         normalButton.setIcon(img);
         normalButton.setFont(new Font("times", Font.BOLD, 50));
         normalButton.setForeground(Color.WHITE);
@@ -128,17 +128,17 @@ public class ChessLobby extends JFrame {
         chess = new JLabel("Chess Game");
         chess.setFont(new Font("times", Font.BOLD, 80));
         chess.setForeground(Color.WHITE);
-        chess.setBounds(710, 70, 500, 150);
+        chess.setBounds(470, 35, 500, 150);
         chess.setHorizontalAlignment(JLabel.CENTER);
 
         select = new JLabel("Select Difficulty");
-        select.setBounds(100, 564, 600, 150);
-        select.setFont(new Font("times", Font.BOLD, 70));
+        select.setBounds(40, 410, 500, 150);
+        select.setFont(new Font("times", Font.BOLD, 50));
         select.setForeground(Color.getHSBColor(51, 100, 100));
         select.setVisible(false);
 
         wButton = new JButton();
-        wButton.setBounds(710, 403, 500, 150);
+        wButton.setBounds(470, 303, 500, 150);
         wButton.setIcon(img);
         wButton.setFont(new Font("times", Font.BOLD, 50));
         wButton.setForeground(Color.WHITE);
@@ -150,7 +150,7 @@ public class ChessLobby extends JFrame {
         wButton.setVisible(false);
 
         bButton = new JButton();
-        bButton.setBounds(710, 726, 500, 150);
+        bButton.setBounds(470, 526, 500, 150);
         bButton.setIcon(img);
         bButton.setFont(new Font("times", Font.BOLD, 50));
         bButton.setForeground(Color.WHITE);

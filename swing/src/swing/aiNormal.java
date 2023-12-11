@@ -88,30 +88,9 @@ public class aiNormal {
 			find(startX, startY, betterScore, bestMoves, generator.getMovesThatResolveCheck(startX, startY, chess));
 		} else if (check == false) {
 
-			switch (chess.getType()) {
-			case PAWN:
-				find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
-				break;
-			case ROOK:
-				find(startX, startY, betterScore, bestMoves, generator.getValidRookMoves(startX, startY));
-				break;
-			case BISHOP:
-				find(startX, startY, betterScore, bestMoves, generator.getValidBishopMoves(startX, startY));
-				break;
-			case QUEEN:
-				find(startX, startY, betterScore, bestMoves, generator.getValidQueenMoves(startX, startY));
-				break;
-			case KING:
-				find(startX, startY, betterScore, bestMoves, generator.getValidKingMoves(startX, startY));
-				break;
-			case KNIGHT:
-				find(startX, startY, betterScore, bestMoves, generator.getValidKnightMoves(startX, startY));
-				break;
-			default:
-				find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
-				break;
+			find(startX, startY, betterScore, bestMoves, generator.getMovesThatResolveCheck(startX, startY, chess));
 			}
-		}
+		
 
 		return bestMoves;
 	}

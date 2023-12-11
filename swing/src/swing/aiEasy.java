@@ -61,29 +61,7 @@ public class aiEasy {
 		if (check == true) {
 			find(startX, startY, betterScore, bestMoves, generator.getMovesThatResolveCheck(startX, startY, chess));
 		} else if (check == false) {
-			switch (chess.getType()) {
-			case PAWN:
-				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
-				break;
-			case ROOK:
-				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidRookMoves(startX, startY));
-				break;
-			case BISHOP:
-				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidBishopMoves(startX, startY));
-				break;
-			case QUEEN:
-				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidQueenMoves(startX, startY));
-				break;
-			case KING:
-				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidKingMoves(startX, startY));
-				break;
-			case KNIGHT:
-				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidKnightMoves(startX, startY));
-				break;
-			default:
-				bestMoves = find(startX, startY, betterScore, bestMoves, generator.getValidPawnMoves(startX, startY));
-				break;
-			}
+			find(startX, startY, betterScore, bestMoves, generator.getMovesThatResolveCheck(startX, startY, chess));
 		}
 
 		return bestMoves;
