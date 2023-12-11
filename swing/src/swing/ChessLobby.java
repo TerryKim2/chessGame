@@ -138,7 +138,7 @@ public class ChessLobby extends JFrame {
         chess = new JLabel("Chess Game");
         chess.setFont(new Font("times", Font.BOLD, 80));
         chess.setForeground(Color.WHITE);
-        chess.setBounds(470, 35, 500, 150);
+        chess.setBounds(470, 35, 600, 150);
         chess.setHorizontalAlignment(JLabel.CENTER);
 
         select = new JLabel("Select Difficulty");

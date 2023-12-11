@@ -49,13 +49,13 @@ public class aiEasy {
 
 		for (int i = 0; i < 8; i++) {
 			for (int m = 0; m < 8; m++) {
-				if (board.d()[i][m] != null && board.d()[i][m].isWhite() == myColor) {
-					calculate(i, m, board.d()[i][m]);
+				if (board.state()[i][m] != null && board.state()[i][m].isWhite() == myColor) {
+					calculate(i, m, board.state()[i][m]);
 					if (cmove == true) {
 						continue;
 					} else if (cmove != true) {
-						bestMove = calculate(i, m, board.d()[i][m]);
-						st = board.d()[i][m];
+						bestMove = calculate(i, m, board.state()[i][m]);
+						st = board.state()[i][m];
 						st.points = new Point(i, m);
 					}
 				}

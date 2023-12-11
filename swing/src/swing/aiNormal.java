@@ -52,14 +52,14 @@ public class aiNormal {
 
 		for (int i = 0; i < 8; i++) {
 			for (int m = 0; m < 8; m++) {
-				if (board.d()[i][m] != null && board.d()[i][m].isWhite() == myColor) {
-					bestMove = calculate(i, m, board.d()[i][m]);
+				if (board.state()[i][m] != null && board.state()[i][m].isWhite() == myColor) {
+					bestMove = calculate(i, m, board.state()[i][m]);
 					/** cmove == can not move */
 					if (cmove == true) {
 						continue;
 					} else if (cmove != true) {
 						if (bestMove.size() > 0) {
-							st = board.d()[i][m];
+							st = board.state()[i][m];
 							st.points = new Point(i, m);
 							if (btScore < nScore) {
 								btScore = nScore;
