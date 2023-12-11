@@ -21,7 +21,6 @@ public class aiNormal {
 	public int randomValue = 0;
 	List<ChessPiece> pieces = new ArrayList<>();
 	private boolean check;
-	private boolean immovable;
 
 	// for selectedPiece
 	// AI chess pieces that can be moved make the highest-scoring moves after
@@ -51,9 +50,9 @@ public class aiNormal {
 				if (board.d()[i][m] != null && board.d()[i][m].isWhite() == myColor) {
 					bestMove = calculate(i, m, board.d()[i][m]);
 					// 해당칸의 말이 사라졌을 때, 체크가 된다면,continue;
-					if (cmove == true || immovable == true) {
+					if (cmove == true) {
 						continue;
-					} else if (cmove != true && immovable == false) {
+					} else if (cmove != true) {
 						if (bestMove.size() > 0) {
 							st = board.d()[i][m];
 							st.points = new Point(i, m);
@@ -73,7 +72,6 @@ public class aiNormal {
 			}
 		}
 
-		immovable = false;
 		btScore = 0;
 		return totalMove;
 	}
@@ -127,31 +125,28 @@ public class aiNormal {
 		generator = mv;
 		state = bd;
 		// ChessPiece selectPiece;
-
 		bestMove1 = select(board);
 		randomValue = (int) (Math.random() * bestMove1.size());
-		// if(bestMove1.size() != 0) {
+
 		if (pieces.size() == 1) {
 			randomValue = 0;
 		} else if (pieces.size() > 1) {
 			randomValue = (int) (Math.random() * bestMove1.size());
 		}
-		System.out.println("SIZE OF PIECES LIST: " + pieces.size());
-		System.out.println("RANDOM VALUE: " + randomValue);
+
 		if (pieces.size() > 0) {
 			st = pieces.get(randomValue);
 		} else {
 			st = null;
 		}
-		//System.out.println("랜덤값: "+randomValue);
-		//System.out.println("piece사이즈: "+pieces.size());
+
 		if (bestMove1.isEmpty() != true) {
 			board.aiMovePiece(st, bestMove1.get(randomValue).x, bestMove1.get(randomValue).y);
 		} else {
 			board.aiMovePiece(st, 0, 0);
 		}
 
-		// }
+
 
 	}
 
