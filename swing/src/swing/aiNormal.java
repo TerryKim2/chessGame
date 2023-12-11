@@ -87,7 +87,6 @@ public class aiNormal {
 		if (check == true) {
 			find(startX, startY, betterScore, bestMoves, generator.getMovesThatResolveCheck(startX, startY, chess));
 		} else if (check == false) {
-
 			find(startX, startY, betterScore, bestMoves, generator.getMovesThatResolveCheck(startX, startY, chess));
 			}
 		
